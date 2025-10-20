@@ -1,3 +1,10 @@
+Miembros:
+
+
+
+
+Narciso Perez
+
 # Sistema de Gestión de Estudiantes Universitarios
 
 Este proyecto es una aplicación web completa diseñada para gestionar eficientemente los datos de los estudiantes de una universidad. Incluye funcionalidades como registro, consulta, actualización y eliminación de información académica y personal, con una arquitectura clara y escalable.
