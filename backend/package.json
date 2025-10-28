@@ -1,9 +1,9 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "src/Index.ts",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "ts-node src/Index.ts",
+    "start": "ts-node src/index.ts",
     "dev": "nodemon --exec ts-node src/Index.ts",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"

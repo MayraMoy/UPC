@@ -1,4 +1,4 @@
-export interface User {
+export interface Users {
   id: number;
   email: string;
   name?: string;
@@ -6,7 +6,7 @@ export interface User {
   updatedAt: Date;
 }
 
-export interface UserWithPosts extends User {
+export interface UserWithPosts extends Users {
   posts: Array<{
     id: number;
     title: string;

@@ -1,4 +1,4 @@
-export interface Post {
+export interface Posts {
   id: number;
   title: string;
   content?: string;
@@ -8,7 +8,7 @@ export interface Post {
   updatedAt: Date;
 }
 
-export interface PostWithAuthor extends Post {
+export interface PostWithAuthor extends Posts {
   author: {
     id: number;
     name: string;
