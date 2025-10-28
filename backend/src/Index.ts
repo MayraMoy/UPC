@@ -3,6 +3,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import studentRoutes from './routes/studentRoutes';
+import careerRoutes from './routes/careerRoutes';
+import authRoutes from './routes/authRoutes';
 
 // Importar rutas
 //import userRoutes from './apis/userRoutes';
@@ -22,6 +25,10 @@ app.use(morgan('combined'));
 app.use(express.json());
 
 // Rutas
+// Rutas irán aquí (ej. /api/students)
+app.use('/api/auth', authRoutes);
+app.use('/api/students', studentRoutes);
+app.use('/api/careers', careerRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 // Ruta de salud

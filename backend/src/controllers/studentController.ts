@@ -30,12 +30,12 @@ export const createStudent = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Faltan campos obligatorios' });
     }
 
-    const existing = await prisma.estudiante.findUnique({ where: { dni } });
+    const existing = await prisma.ESTUDIANTES.findUnique({ where: { dni } });
     if (existing) {
       return res.status(400).json({ error: 'El DNI ya está registrado' });
     }
 
-    const newStudent = await prisma.estudiante.create({
+    const newStudent = await prisma.ESTUDIANTES.create({
       data: {
         nombres,
         apellidos,
@@ -81,7 +81,7 @@ export const getStudents = async (req: Request, res: Response) => {
     if (apellidos)
       where.apellidos = { contains: String(apellidos), mode: 'insensitive' };
 
-    const students = await prisma.estudiante.findMany({
+    const students = await prisma.ESTUDIANTES.findMany({
       where,
       include: {
         pais: true,
@@ -103,7 +103,7 @@ export const getStudentById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const student = await prisma.estudiante.findUnique({
+    const student = await prisma.ESTUDIANTES.findUnique({
       where: { id_estudiante: Number(id) },
       include: {
         pais: true,
@@ -134,7 +134,7 @@ export const updateStudent = async (req: Request, res: Response) => {
     delete data.id_estudiante;
     delete data.dni;
 
-    const updatedStudent = await prisma.estudiante.update({
+    const updatedStudent = await prisma.ESTUDIANTES.update({
       where: { id_estudiante: Number(id) },
       data: {
         ...data,
@@ -166,7 +166,7 @@ export const deactivateStudent = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { causa_inactividad } = req.body;
 
-    const deactivatedStudent = await prisma.estudiante.update({
+    const deactivatedStudent = await prisma.ESTUDIANTES.update({
       where: { id_estudiante: Number(id) },
       data: {
         estado: 'Inactivo',

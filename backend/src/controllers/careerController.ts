@@ -17,12 +17,12 @@ export const createCareer = async (req: Request, res: Response) => {
     }
 
     // Verificar si ya existe una carrera con ese nombre
-    const existing = await prisma.carrera.findUnique({ where: { nombre } });
+    const existing = await prisma.CARRERAS.findUnique({ where: { nombre } });
     if (existing) {
       return res.status(400).json({ error: 'Ya existe una carrera con ese nombre' });
     }
 
-    const newCareer = await prisma.carrera.create({
+    const newCareer = await prisma.CARRERAS.create({
       data: {
         nombre,
         duracion: Number(duracion),
@@ -50,7 +50,7 @@ export const getCareers = async (req: Request, res: Response) => {
       where.nombre = { contains: String(nombre), mode: 'insensitive' };
     }
 
-    const careers = await prisma.carrera.findMany({
+    const careers = await prisma.CARRERAS.findMany({
       where,
       orderBy: { nombre: 'asc' },
     });
@@ -68,7 +68,7 @@ export const getCareers = async (req: Request, res: Response) => {
 export const getCareerById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const career = await prisma.carrera.findUnique({
+    const career = await prisma.CARRERAS.findUnique({
       where: { id_carrera: Number(id) },
     });
 
@@ -91,7 +91,7 @@ export const updateCareer = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { nombre, duracion, tituloOtorgado } = req.body;
 
-    const career = await prisma.carrera.update({
+    const career = await prisma.CARRERAS.update({
       where: { id_carrera: Number(id) },
       data: {
         nombre,
