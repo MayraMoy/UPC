@@ -8,9 +8,9 @@ const postService = new PostService();
 router.get('/', async (req, res) => {
   try {
     const posts = await postService.getAllPosts();
-    res.json(posts);
+    return res.json(posts);
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -24,9 +24,9 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Post not found' });
     }
     
-    res.json(post);
+    return res.json(post);
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -46,9 +46,9 @@ router.post('/', async (req, res) => {
       authorId: parseInt(authorId)
     });
     
-    res.status(201).json(newPost);
+    return res.status(201).json(newPost);
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 

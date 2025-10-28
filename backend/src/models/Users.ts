@@ -1,9 +1,20 @@
-import { Prisma } from '@prisma/client';
+export interface User {
+  id: number;
+  email: string;
+  name?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-export type User = Prisma.UserGetPayload<{}>;
-export type UserWithPosts = Prisma.UserGetPayload<{
-  include: { posts: true };
-}>;
+export interface UserWithPosts extends User {
+  posts: Array<{
+    id: number;
+    title: string;
+    content?: string;
+    published: boolean;
+    authorId: number;
+  }>;
+}
 
 export interface CreateUserData {
   email: string;

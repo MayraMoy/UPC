@@ -10,9 +10,9 @@ const postService = new PostService();
 router.get('/', async (req, res) => {
   try {
     const users = await userService.getAllUsers();
-    res.json(users);
+    return res.json(users);
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -26,9 +26,9 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    res.json(user);
+    return res.json(user);
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -47,9 +47,9 @@ router.post('/', async (req, res) => {
     }
     
     const newUser = await userService.createUser({ email, name });
-    res.status(201).json(newUser);
+    return res.status(201).json(newUser);
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -65,9 +65,9 @@ router.put('/:id', async (req, res) => {
     }
     
     const updatedUser = await userService.updateUser(id, { email, name });
-    res.json(updatedUser);
+    return res.json(updatedUser);
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -82,9 +82,9 @@ router.delete('/:id', async (req, res) => {
     }
     
     await userService.deleteUser(id);
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -93,9 +93,9 @@ router.get('/:id/posts', async (req, res) => {
   try {
     const authorId = parseInt(req.params.id);
     const posts = await postService.getPostsByAuthor(authorId);
-    res.json(posts);
+    return res.json(posts);
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 

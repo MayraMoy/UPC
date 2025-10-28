@@ -1,0 +1,124 @@
+-- CreateTable
+CREATE TABLE "PAISES" (
+    "id_pais" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "nombre" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "LOCALIDADES" (
+    "id_localidad" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "nombre" TEXT NOT NULL,
+    "id_pais" INTEGER NOT NULL,
+    CONSTRAINT "LOCALIDADES_id_pais_fkey" FOREIGN KEY ("id_pais") REFERENCES "PAISES" ("id_pais") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "AREAS_TELEFONICAS" (
+    "id_area_telefonica" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "codigo" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "GENEROS" (
+    "id_genero" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "nombre" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "CARRERAS" (
+    "id_carrera" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "nombre" TEXT NOT NULL,
+    "duracion" INTEGER NOT NULL,
+    "titulo_otorgado" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "MATERIAS" (
+    "id_materia" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "nombre" TEXT NOT NULL,
+    "id_carrera" INTEGER NOT NULL,
+    CONSTRAINT "MATERIAS_id_carrera_fkey" FOREIGN KEY ("id_carrera") REFERENCES "CARRERAS" ("id_carrera") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "CONDICIONES" (
+    "id_condition" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "nombre" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "ESTUDIANTES" (
+    "id_estudiante" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id_pais" INTEGER NOT NULL,
+    "id_localidad" INTEGER NOT NULL,
+    "id_area_telefonica" INTEGER NOT NULL,
+    "id_genero" INTEGER NOT NULL,
+    "nombres" TEXT NOT NULL,
+    "apellidos" TEXT NOT NULL,
+    "dni" TEXT NOT NULL,
+    "fecha_nacimiento" DATETIME NOT NULL,
+    "email" TEXT NOT NULL,
+    "telefono" TEXT NOT NULL,
+    "domicilio" TEXT NOT NULL,
+    "fecha_ingreso" DATETIME NOT NULL,
+    "cohorte" TEXT NOT NULL,
+    "secundario" TEXT NOT NULL,
+    "cuil" TEXT NOT NULL,
+    "examen_mayores25" BOOLEAN NOT NULL,
+    "solicito_beca" BOOLEAN NOT NULL,
+    "trabajador" BOOLEAN NOT NULL,
+    "persona_a_cargo" BOOLEAN NOT NULL,
+    "observaciones" TEXT,
+    "estado" TEXT NOT NULL DEFAULT 'Activo',
+    CONSTRAINT "ESTUDIANTES_id_pais_fkey" FOREIGN KEY ("id_pais") REFERENCES "PAISES" ("id_pais") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "ESTUDIANTES_id_localidad_fkey" FOREIGN KEY ("id_localidad") REFERENCES "LOCALIDADES" ("id_localidad") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "ESTUDIANTES_id_area_telefonica_fkey" FOREIGN KEY ("id_area_telefonica") REFERENCES "AREAS_TELEFONICAS" ("id_area_telefonica") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "ESTUDIANTES_id_genero_fkey" FOREIGN KEY ("id_genero") REFERENCES "GENEROS" ("id_genero") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "INSCRIPCIONES" (
+    "id_inscripcion" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id_estudiante" INTEGER NOT NULL,
+    "id_carrera" INTEGER NOT NULL,
+    "fecha_inscripcion" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "estado" BOOLEAN NOT NULL DEFAULT true,
+    "causa_inactividad" TEXT,
+    CONSTRAINT "INSCRIPCIONES_id_estudiante_fkey" FOREIGN KEY ("id_estudiante") REFERENCES "ESTUDIANTES" ("id_estudiante") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "INSCRIPCIONES_id_carrera_fkey" FOREIGN KEY ("id_carrera") REFERENCES "CARRERAS" ("id_carrera") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ESTUDIANTES_CARRERAS" (
+    "id_ec" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id_estudiante" INTEGER NOT NULL,
+    "id_carrera" INTEGER NOT NULL,
+    "fecha_alta" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "fecha_baja" DATETIME,
+    CONSTRAINT "ESTUDIANTES_CARRERAS_id_estudiante_fkey" FOREIGN KEY ("id_estudiante") REFERENCES "ESTUDIANTES" ("id_estudiante") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "ESTUDIANTES_CARRERAS_id_carrera_fkey" FOREIGN KEY ("id_carrera") REFERENCES "CARRERAS" ("id_carrera") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "CURSADAS" (
+    "id_cursada" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id_estudiante" INTEGER NOT NULL,
+    "id_materia" INTEGER NOT NULL,
+    "nota_final" DECIMAL,
+    CONSTRAINT "CURSADAS_id_estudiante_fkey" FOREIGN KEY ("id_estudiante") REFERENCES "ESTUDIANTES" ("id_estudiante") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "CURSADAS_id_materia_fkey" FOREIGN KEY ("id_materia") REFERENCES "MATERIAS" ("id_materia") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "CONDICIONES_MATERIAS" (
+    "id_cm" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id_estudiante" INTEGER NOT NULL,
+    "id_materia" INTEGER NOT NULL,
+    "id_condition" INTEGER NOT NULL,
+    CONSTRAINT "CONDICIONES_MATERIAS_id_estudiante_fkey" FOREIGN KEY ("id_estudiante") REFERENCES "ESTUDIANTES" ("id_estudiante") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "CONDICIONES_MATERIAS_id_materia_fkey" FOREIGN KEY ("id_materia") REFERENCES "MATERIAS" ("id_materia") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "CONDICIONES_MATERIAS_id_condition_fkey" FOREIGN KEY ("id_condition") REFERENCES "CONDICIONES" ("id_condition") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ESTUDIANTES_dni_key" ON "ESTUDIANTES"("dni");
