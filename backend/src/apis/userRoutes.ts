@@ -35,10 +35,10 @@ router.get('/:id', async (req, res) => {
 // POST /api/users
 router.post('/', async (req, res) => {
   try {
-    const { email, name } = req.body;
+    const { email, name, password } = req.body;
     
-    if (!email) {
-      return res.status(400).json({ error: 'Email is required' });
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
     }
     
     const existingUser = await userService.getUserByEmail(email);
@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
       return res.status(409).json({ error: 'User already exists' });
     }
     
-    const newUser = await userService.createUser({ email, name });
+    const newUser = await userService.createUser({ email, name, password });
     return res.status(201).json(newUser);
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error' });

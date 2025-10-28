@@ -19,6 +19,7 @@ export interface UserWithPosts extends Users {
 export interface CreateUserData {
   email: string;
   name?: string;
+  password: string;
 }
 
 export interface UpdateUserData {

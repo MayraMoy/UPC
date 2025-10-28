@@ -5,60 +5,40 @@ const prisma = new PrismaClient();
 
 export class UserService {
   async getAllUsers() {
-    return await prisma.eSTUDIANTES.findMany();
+    return await prisma.users.findMany({
+      include: { posts: true }
+    });
   }
 
   async getUserById(id: number) {
-    return await prisma.eSTUDIANTES.findUnique({
-      where: { id_estudiante: id }
+    return await prisma.users.findUnique({
+      where: { id },
+      include: { posts: true }
     });
   }
 
   async getUserByEmail(email: string) {
-    return await prisma.eSTUDIANTES.findFirst({
+    return await prisma.users.findUnique({
       where: { email }
     });
   }
 
-  async createUser(userData: CreateUserData) {
-    return await prisma.eSTUDIANTES.create({
-      data: {
-        nombres: userData.name || '',
-        email: userData.email,
-        id_pais: 1,
-        id_localidad: 1,
-        id_area_telefonica: 1,
-        id_genero: 1,
-        apellidos: '',
-        dni: '',
-        fecha_nacimiento: new Date(),
-        telefono: '',
-        domicilio: '',
-        fecha_ingreso: new Date(),
-        cohorte: '',
-        secundario: '',
-        cuil: '',
-        examen_mayores25: false,
-        solicito_beca: false,
-        trabajador: false,
-        persona_a_cargo: false
-      }
+  async createUser(usersData: CreateUserData) {
+    return await prisma.users.create({
+      data: usersData
     });
   }
 
-  async updateUser(id: number, userData: UpdateUserData) {
-    return await prisma.eSTUDIANTES.update({
-      where: { id_estudiante: id },
-      data: {
-        nombres: userData.name || undefined,
-        email: userData.email || undefined
-      }
+  async updateUser(id: number, usersData: UpdateUserData) {
+    return await prisma.users.update({
+      where: { id },
+      data: usersData
     });
   }
 
   async deleteUser(id: number) {
-    return await prisma.eSTUDIANTES.delete({
-      where: { id_estudiante: id }
+    return await prisma.users.delete({
+      where: { id }
     });
   }
 }

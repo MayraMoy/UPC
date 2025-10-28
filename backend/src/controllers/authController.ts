@@ -14,7 +14,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Buscar usuario
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.users.findUnique({ where: { email } });
     if (!user) {
       return res.status(401).json({ error: 'Credenciales incorrectas' });
     }
