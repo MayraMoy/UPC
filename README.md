@@ -2,6 +2,7 @@
 
 Este proyecto es una aplicación web completa diseñada para gestionar eficientemente los datos de los estudiantes de una universidad. Incluye funcionalidades como registro, consulta, actualización y eliminación de información académica y personal, con una arquitectura clara y escalable.
 
+[Estado Actual del Proyecto en la rama Mayra](https://docs.google.com/document/d/17bL4k_LaNaLUVvG0UTxl0JTacXGOcvAjnLyinWqf9To/edit?usp=sharing)
 ---
 
 ## 📁 Estructura del Proyecto
