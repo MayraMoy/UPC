@@ -3,18 +3,28 @@
   "version": "1.0.0",
   "main": "src/index.ts",
   "scripts": {
+<<<<<<< HEAD
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node src/server.ts",
+    "studio": "prisma studio"
+=======
     "start": "ts-node src/index.ts",
     "dev": "nodemon --exec ts-node src/Index.ts",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
+>>>>>>> 481072290cb62a172b1e02102e7fb2e88b5ed72b
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+<<<<<<< HEAD
+    "@prisma/client": "^6.17.1",
+=======
     "@prisma/client": "^6.18.0",
     "@types/bcrypt": "^6.0.0",
+>>>>>>> 481072290cb62a172b1e02102e7fb2e88b5ed72b
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
@@ -25,6 +35,17 @@
     "morgan": "^1.10.1"
   },
   "devDependencies": {
+<<<<<<< HEAD
+    "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.9.1",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+=======
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.3",
@@ -35,5 +56,6 @@
     "prisma": "^6.18.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
+>>>>>>> 481072290cb62a172b1e02102e7fb2e88b5ed72b
   }
 }
