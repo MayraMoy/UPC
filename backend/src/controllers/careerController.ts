@@ -7,26 +7,26 @@ import prisma from '../prisma';
  */
 export const createCareer = async (req: Request, res: Response) => {
   try {
-    const { nombre, duracion, tituloOtorgado } = req.body;
+    const { nombre, duracion, titulo_otorgado } = req.body;
 
     // Validación de campos obligatorios
-    if (!nombre || !duracion || !tituloOtorgado) {
+    if (!nombre || !duracion || !titulo_otorgado) {
       return res.status(400).json({
-        error: 'Faltan campos obligatorios: nombre, duracion, tituloOtorgado',
+        error: 'Faltan campos obligatorios: nombre, duracion, titulo_otorgado',
       });
     }
 
     // Verificar si ya existe una carrera con ese nombre
-    const existing = await prisma.carrera.findUnique({ where: { nombre } });
+    const existing = await prisma.cARRERAS.findFirst({ where: { nombre } });
     if (existing) {
       return res.status(400).json({ error: 'Ya existe una carrera con ese nombre' });
     }
 
-    const newCareer = await prisma.carrera.create({
+    const newCareer = await prisma.cARRERAS.create({
       data: {
         nombre,
         duracion: Number(duracion),
-        tituloOtorgado,
+        titulo_otorgado: titulo_otorgado,
       },
     });
 
@@ -50,7 +50,7 @@ export const getCareers = async (req: Request, res: Response) => {
       where.nombre = { contains: String(nombre), mode: 'insensitive' };
     }
 
-    const careers = await prisma.carrera.findMany({
+    const careers = await prisma.cARRERAS.findMany({
       where,
       orderBy: { nombre: 'asc' },
     });
@@ -68,7 +68,7 @@ export const getCareers = async (req: Request, res: Response) => {
 export const getCareerById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const career = await prisma.carrera.findUnique({
+    const career = await prisma.cARRERAS.findUnique({
       where: { id_carrera: Number(id) },
     });
 
@@ -89,14 +89,14 @@ export const getCareerById = async (req: Request, res: Response) => {
 export const updateCareer = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { nombre, duracion, tituloOtorgado } = req.body;
+    const { nombre, duracion, titulo_otorgado } = req.body;
 
-    const career = await prisma.carrera.update({
+    const career = await prisma.cARRERAS.update({
       where: { id_carrera: Number(id) },
       data: {
         nombre,
         duracion: duracion ? Number(duracion) : undefined,
-        tituloOtorgado,
+        titulo_otorgado: titulo_otorgado,
       },
     });
 

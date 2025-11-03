@@ -1,27 +1,41 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/index.ts",
   "scripts": {
+<<<<<<< HEAD
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node src/server.ts",
     "studio": "prisma studio"
+=======
+    "start": "ts-node src/index.ts",
+    "dev": "nodemon --exec ts-node src/Index.ts",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+>>>>>>> 481072290cb62a172b1e02102e7fb2e88b5ed72b
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+<<<<<<< HEAD
     "@prisma/client": "^6.17.1",
+=======
+    "@prisma/client": "^6.18.0",
+    "@types/bcrypt": "^6.0.0",
+>>>>>>> 481072290cb62a172b1e02102e7fb2e88b5ed72b
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "helmet": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
-    "prisma": "^6.17.1"
+    "morgan": "^1.10.1"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@types/bcrypt": "^6.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
@@ -31,5 +45,17 @@
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+=======
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^24.8.1",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.18.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+>>>>>>> 481072290cb62a172b1e02102e7fb2e88b5ed72b
   }
 }

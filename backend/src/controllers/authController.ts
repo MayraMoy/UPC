@@ -14,7 +14,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Buscar usuario
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.users.findUnique({ where: { email } });
     if (!user) {
       return res.status(401).json({ error: 'Credenciales incorrectas' });
     }
@@ -33,15 +33,15 @@ export const login = async (req: Request, res: Response) => {
 
     // Responder sin la contraseña
     const { password: _, ...userWithoutPassword } = user;
-    res.json({ token, user: userWithoutPassword });
+    return res.json({ token, user: userWithoutPassword });
   } catch (error) {
     console.error('Error en login:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    return res.status(500).json({ error: 'Error interno del servidor' });
   }
 };
 
 // Logout (opcional, solo frontend)
 export const logout = async (req: Request, res: Response) => {
   // En JWT stateless, el logout se maneja en frontend (borrar token)
-  res.json({ message: 'Sesión cerrada' });
+  return res.json({ message: 'Sesión cerrada' });
 };

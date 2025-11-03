@@ -30,12 +30,12 @@ export const createStudent = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Faltan campos obligatorios' });
     }
 
-    const existing = await prisma.estudiante.findUnique({ where: { dni } });
+    const existing = await prisma.eSTUDIANTES.findUnique({ where: { dni } });
     if (existing) {
       return res.status(400).json({ error: 'El DNI ya está registrado' });
     }
 
-    const newStudent = await prisma.estudiante.create({
+    const newStudent = await prisma.eSTUDIANTES.create({
       data: {
         nombres,
         apellidos,
@@ -81,12 +81,12 @@ export const getStudents = async (req: Request, res: Response) => {
     if (apellidos)
       where.apellidos = { contains: String(apellidos), mode: 'insensitive' };
 
-    const students = await prisma.estudiante.findMany({
+    const students = await prisma.eSTUDIANTES.findMany({
       where,
       include: {
         pais: true,
         localidad: true,
-        areaTelefonica: true,
+        area_telefonica: true,
         genero: true,
       },
     });
@@ -103,12 +103,12 @@ export const getStudentById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const student = await prisma.estudiante.findUnique({
+    const student = await prisma.eSTUDIANTES.findUnique({
       where: { id_estudiante: Number(id) },
       include: {
         pais: true,
         localidad: true,
-        areaTelefonica: true,
+        area_telefonica: true,
         genero: true,
       },
     });
@@ -134,7 +134,7 @@ export const updateStudent = async (req: Request, res: Response) => {
     delete data.id_estudiante;
     delete data.dni;
 
-    const updatedStudent = await prisma.estudiante.update({
+    const updatedStudent = await prisma.eSTUDIANTES.update({
       where: { id_estudiante: Number(id) },
       data: {
         ...data,
@@ -166,11 +166,11 @@ export const deactivateStudent = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { causa_inactividad } = req.body;
 
-    const deactivatedStudent = await prisma.estudiante.update({
+    const deactivatedStudent = await prisma.eSTUDIANTES.update({
       where: { id_estudiante: Number(id) },
       data: {
         estado: 'Inactivo',
-        causa_inactividad: causa_inactividad || 'Desactivado por usuario',
+        observaciones: causa_inactividad || 'Desactivado por usuario',
       },
     });
 

@@ -12,7 +12,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   try {
     const decoded = verifyToken(token);
     (req as any).user = { id: decoded.id, role: decoded.role };
-    next();
+    return next();
   } catch (err) {
     return res.status(401).json({ error: 'Token inválido o expirado' });
   }
@@ -25,6 +25,6 @@ export const authorizeRoles = (...allowedRoles: string[]) => {
     if (!allowedRoles.includes(user.role)) {
       return res.status(403).json({ error: 'Acceso denegado' });
     }
-    next();
+    return next();
   };
 };
