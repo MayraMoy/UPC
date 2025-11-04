@@ -17,20 +17,20 @@ export const createCareer = async (req: Request, res: Response) => {
     }
 
     // Verificar si ya existe una carrera con ese nombre
-    const existing = await prisma.cARRERAS.findFirst({ where: { nombre } });
+    const existing = await prisma.carrera.findFirst({ where: { nombre } });
     if (existing) {
       return res.status(400).json({ error: 'Ya existe una carrera con ese nombre' });
     }
 
-    const newCareer = await prisma.cARRERAS.create({
+    const newCareer = await prisma.carrera.create({
       data: {
         nombre,
         duracion: Number(duracion),
-        titulo_otorgado: titulo_otorgado,
+        tituloOtorgado: titulo_otorgado,
       },
     });
 
-    console.log(`[AUDIT] Carrera creada: ID=${newCareer.id_carrera}, Nombre="${newCareer.nombre}"`);
+    console.log(`[AUDIT] Carrera creada: ID=${newCareer.id}, Nombre="${newCareer.nombre}"`);
     return res.status(201).json(newCareer);
   } catch (error: any) {
     console.error('Error al crear carrera:', error);
@@ -50,7 +50,7 @@ export const getCareers = async (req: Request, res: Response) => {
       where.nombre = { contains: String(nombre), mode: 'insensitive' };
     }
 
-    const careers = await prisma.cARRERAS.findMany({
+    const careers = await prisma.carrera.findMany({
       where,
       orderBy: { nombre: 'asc' },
     });
@@ -68,8 +68,8 @@ export const getCareers = async (req: Request, res: Response) => {
 export const getCareerById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const career = await prisma.cARRERAS.findUnique({
-      where: { id_carrera: Number(id) },
+    const career = await prisma.carrera.findUnique({
+      where: { id: Number(id) },
     });
 
     if (!career) {
@@ -91,16 +91,16 @@ export const updateCareer = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { nombre, duracion, titulo_otorgado } = req.body;
 
-    const career = await prisma.cARRERAS.update({
-      where: { id_carrera: Number(id) },
+    const career = await prisma.carrera.update({
+      where: { id: Number(id) },
       data: {
         nombre,
         duracion: duracion ? Number(duracion) : undefined,
-        titulo_otorgado: titulo_otorgado,
+        tituloOtorgado: titulo_otorgado,
       },
     });
 
-    console.log(`[AUDIT] Carrera actualizada: ID=${career.id_carrera}`);
+    console.log(`[AUDIT] Carrera actualizada: ID=${career.id}`);
     return res.json(career);
   } catch (error: any) {
     console.error('Error al actualizar carrera:', error);

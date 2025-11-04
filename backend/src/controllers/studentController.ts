@@ -19,10 +19,10 @@ export const createStudent = async (req: Request, res: Response) => {
       cohorte,
       secundario,
       cuil,
-      examen_mayores25 = false,
-      solicito_beca = false,
+      examenMayores25 = false,
+      solicitoBeca = false,
       trabajador = false,
-      persona_a_cargo = false,
+      personaACargo = false,
       observaciones,
     } = req.body;
 
@@ -30,12 +30,12 @@ export const createStudent = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Faltan campos obligatorios' });
     }
 
-    const existing = await prisma.eSTUDIANTES.findUnique({ where: { dni } });
+    const existing = await prisma.estudiante.findUnique({ where: { dni } });
     if (existing) {
       return res.status(400).json({ error: 'El DNI ya está registrado' });
     }
 
-    const newStudent = await prisma.eSTUDIANTES.create({
+    const newStudent = await prisma.estudiante.create({
       data: {
         nombres,
         apellidos,
@@ -43,25 +43,25 @@ export const createStudent = async (req: Request, res: Response) => {
         email,
         telefono,
         domicilio,
-        fecha_nacimiento: new Date(fecha_nacimiento),
-        id_pais: Number(id_pais),
-        id_localidad: Number(id_localidad),
-        id_area_telefonica: Number(id_area_telefonica),
-        id_genero: Number(id_genero),
+        fechaNacimiento: new Date(fecha_nacimiento),
+        paisId: Number(id_pais),
+        localidadId: Number(id_localidad),
+        areaTelefonicaId: Number(id_area_telefonica),
+        generoId: Number(id_genero),
         cohorte,
         secundario,
         cuil,
-        examen_mayores25,
-        solicito_beca,
+        examenMayores25,
+        solicitoBeca,
         trabajador,
-        persona_a_cargo,
+        personaACargo,
         observaciones,
         estado: 'Activo',
-        fecha_ingreso: new Date(),
+        fechaIngreso: new Date(),
       },
     });
 
-    console.log(`[AUDIT] Estudiante creado: ${newStudent.id_estudiante}`);
+    console.log(`[AUDIT] Estudiante creado: ${newStudent.id}`);
     return res.status(201).json(newStudent);
   } catch (error) {
     console.error('Error al crear estudiante:', error);
@@ -69,7 +69,7 @@ export const createStudent = async (req: Request, res: Response) => {
   }
 };
 
-// RF 3.2.1.2: Consulta de Estudiantes (listado)
+// RF 3.2.1.2: Consulta de Estudiantes
 export const getStudents = async (req: Request, res: Response) => {
   try {
     const { dni, nombres, apellidos } = req.query;
@@ -81,12 +81,12 @@ export const getStudents = async (req: Request, res: Response) => {
     if (apellidos)
       where.apellidos = { contains: String(apellidos), mode: 'insensitive' };
 
-    const students = await prisma.eSTUDIANTES.findMany({
+    const students = await prisma.estudiante.findMany({
       where,
       include: {
         pais: true,
         localidad: true,
-        area_telefonica: true,
+        areaTelefonica: true,
         genero: true,
       },
     });
@@ -98,17 +98,17 @@ export const getStudents = async (req: Request, res: Response) => {
   }
 };
 
-// RF 3.2.1.2.1: Consulta de Estudiante por ID
+// RF 3.2.1.2.1: Consulta por ID
 export const getStudentById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const student = await prisma.eSTUDIANTES.findUnique({
-      where: { id_estudiante: Number(id) },
+    const student = await prisma.estudiante.findUnique({
+      where: { id: Number(id) },
       include: {
         pais: true,
         localidad: true,
-        area_telefonica: true,
+        areaTelefonica: true,
         genero: true,
       },
     });
@@ -134,25 +134,35 @@ export const updateStudent = async (req: Request, res: Response) => {
     delete data.id_estudiante;
     delete data.dni;
 
-    const updatedStudent = await prisma.eSTUDIANTES.update({
-      where: { id_estudiante: Number(id) },
+    const updatedStudent = await prisma.estudiante.update({
+      where: { id: Number(id) },
       data: {
-        ...data,
-        fecha_nacimiento: data.fecha_nacimiento
+        nombres: data.nombres,
+        apellidos: data.apellidos,
+        email: data.email,
+        telefono: data.telefono,
+        domicilio: data.domicilio,
+        cohorte: data.cohorte,
+        secundario: data.secundario,
+        cuil: data.cuil,
+        examenMayores25: data.examenMayores25,
+        solicitoBeca: data.solicitoBeca,
+        trabajador: data.trabajador,
+        personaACargo: data.personaACargo,
+        observaciones: data.observaciones,
+        fechaNacimiento: data.fecha_nacimiento
           ? new Date(data.fecha_nacimiento)
           : undefined,
-        id_pais: data.id_pais ? Number(data.id_pais) : undefined,
-        id_localidad: data.id_localidad
-          ? Number(data.id_localidad)
-          : undefined,
-        id_area_telefonica: data.id_area_telefonica
+        paisId: data.id_pais ? Number(data.id_pais) : undefined,
+        localidadId: data.id_localidad ? Number(data.id_localidad) : undefined,
+        areaTelefonicaId: data.id_area_telefonica
           ? Number(data.id_area_telefonica)
           : undefined,
-        id_genero: data.id_genero ? Number(data.id_genero) : undefined,
+        generoId: data.id_genero ? Number(data.id_genero) : undefined,
       },
     });
 
-    console.log(`[AUDIT] Estudiante actualizado: ${updatedStudent.id_estudiante}`);
+    console.log(`[AUDIT] Estudiante actualizado: ${updatedStudent.id}`);
     return res.json(updatedStudent);
   } catch (error) {
     console.error('Error al actualizar estudiante:', error);
@@ -166,15 +176,15 @@ export const deactivateStudent = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { causa_inactividad } = req.body;
 
-    const deactivatedStudent = await prisma.eSTUDIANTES.update({
-      where: { id_estudiante: Number(id) },
+    const deactivatedStudent = await prisma.estudiante.update({
+      where: { id: Number(id) },
       data: {
         estado: 'Inactivo',
         observaciones: causa_inactividad || 'Desactivado por usuario',
       },
     });
 
-    console.log(`[AUDIT] Estudiante desactivado: ${deactivatedStudent.id_estudiante}`);
+    console.log(`[AUDIT] Estudiante desactivado: ${deactivatedStudent.id}`);
     return res.json({
       message: 'Estudiante desactivado correctamente',
       student: deactivatedStudent,
@@ -184,3 +194,4 @@ export const deactivateStudent = async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Error al desactivar estudiante' });
   }
 };
+
