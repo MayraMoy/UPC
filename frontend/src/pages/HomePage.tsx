@@ -85,12 +85,6 @@ const HomePage: React.FC = () => {
             Accede al sistema y comienza a gestionar la información estudiantil.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              to="/students" 
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md"
-            >
-              Ver Lista de Estudiantes
-            </Link>
             <button className="bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors duration-200">
               Contactar Soporte
             </button>

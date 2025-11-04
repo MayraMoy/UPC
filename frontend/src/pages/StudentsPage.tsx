@@ -1,14 +1,16 @@
 // src/pages/StudentsPage.tsx
 import { useState, useEffect } from 'react'; 
 import { StudentService, type Estudiante } from '../services/api';
-import { useNavigate } from 'react-router-dom'; // Importa useNavigate
+import { useNavigate, Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function StudentsPage() {
+  const { user, loading: authLoading } = useAuth();
   const [students, setStudents] = useState<Estudiante[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
-  const [searchTerm, setSearchTerm] = useState<string>(''); // Estado para el término de búsqueda
-  const navigate = useNavigate(); // Inicializa useNavigate
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -26,6 +28,15 @@ export default function StudentsPage() {
 
     fetchStudents();
   }, []);
+
+  // Movemos las verificaciones de autenticación aquí
+  if (authLoading) {
+    return <div>Cargando...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
 
   if (loading) {
     return (
