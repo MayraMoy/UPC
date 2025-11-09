@@ -54,7 +54,8 @@
   "include": [
     "src/**/*",
     "src/types/**/*",
-    "src/declarations.d.ts"
+    "src/declarations.d.ts",
+    "src/react-app-env.d.ts"
   ],
   "exclude": [
     "node_modules",

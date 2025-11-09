@@ -1,37 +1,38 @@
-// src/pages/StudentForm.tsx
 import React, { useState } from 'react';
-import type { Estudiante, CreateEstudianteDto } from '../../services/api';
+import type { CreateEstudianteDto, Estudiante } from '../../services/api';
 
 interface StudentFormProps {
-    student?: Estudiante;
-    onSubmit: (data: CreateEstudianteDto) => void;
+  student?: Estudiante;
+  onSubmit: (data: CreateEstudianteDto) => void;
 }
 
 export default function StudentForm({ student, onSubmit }: StudentFormProps) {
-    const [formData, setFormData] = useState<CreateEstudianteDto>({
-  nombres: student?.nombres ?? '',
-  apellidos: student?.apellidos ?? '',
-  dni: student?.dni ?? '',
-  email: student?.email ?? '',
-  telefono: student?.telefono ?? '',
-  domicilio: student?.domicilio ?? '',
-  fecha_nacimiento: student?.fecha_nacimiento? student.fecha_nacimiento.split('T')[0] ?? '': '',
-  id_pais: student?.id_pais ?? 1,
-  id_localidad: student?.id_localidad ?? 1,
-  id_area_telefonica: student?.id_area_telefonica ?? 1,
-  id_genero: student?.id_genero ?? 1,
-  cohorte: student?.cohorte ?? '',
-  secundario: student?.secundario ?? '',
-  cuil: student?.cuil ?? '',
-  examen_mayores25: student?.examen_mayores25 ?? false,
-  solicito_beca: student?.solicito_beca ?? false,
-  trabajador: student?.trabajador ?? false,
-  persona_a_cargo: student?.persona_a_cargo ?? false,
-  observaciones: student?.observaciones ?? '',
-});
+  const [formData, setFormData] = useState<CreateEstudianteDto>({
+    nombres: student?.nombres ?? '',
+    apellidos: student?.apellidos ?? '',
+    dni: student?.dni ?? '',
+    email: student?.email ?? '',
+    telefono: student?.telefono ?? '',
+    domicilio: student?.domicilio ?? '',
+    fechaNacimiento: student?.fechaNacimiento?.split('T')[0] ?? '',
+    paisId: student?.paisId ?? 1,
+    localidadId: student?.localidadId ?? 1,
+    areaTelefonicaId: student?.areaTelefonicaId ?? 1,
+    generoId: student?.generoId ?? 1,
+    cohorte: student?.cohorte ?? '',
+    secundario: student?.secundario ?? '',
+    cuil: student?.cuil ?? '',
+    examenMayores25: student?.examenMayores25 ?? false,
+    solicitoBeca: student?.solicitoBeca ?? false,
+    trabajador: student?.trabajador ?? false,
+    personaACargo: student?.personaACargo ?? false,
+    observaciones: student?.observaciones ?? '',
+  });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, type, value } = e.target;
     const val =
@@ -39,7 +40,7 @@ export default function StudentForm({ student, onSubmit }: StudentFormProps) {
         ? e.target.checked
         : value;
 
-    setFormData(prev => ({ ...prev, [name]: val }));
+    setFormData((prev) => ({ ...prev, [name]: val }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -48,7 +49,6 @@ export default function StudentForm({ student, onSubmit }: StudentFormProps) {
   };
 
   return (
-
     <form
       onSubmit={handleSubmit}
       className="card max-w-3xl mx-auto p-6 shadow-md rounded-md bg-white"
@@ -68,7 +68,6 @@ export default function StudentForm({ student, onSubmit }: StudentFormProps) {
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md"
             required
-            autoComplete="given-name"
           />
         </div>
 
@@ -82,7 +81,6 @@ export default function StudentForm({ student, onSubmit }: StudentFormProps) {
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md"
             required
-            autoComplete="family-name"
           />
         </div>
 
@@ -109,17 +107,18 @@ export default function StudentForm({ student, onSubmit }: StudentFormProps) {
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md"
             required
-            autoComplete="email"
           />
         </div>
 
         {/* Fecha de nacimiento */}
         <div>
-          <label className="block text-sm font-medium mb-1">Fecha de Nacimiento *</label>
+          <label className="block text-sm font-medium mb-1">
+            Fecha de Nacimiento *
+          </label>
           <input
             type="date"
-            name="fecha_nacimiento"
-            value={formData.fecha_nacimiento}
+            name="fechaNacimiento"
+            value={formData.fechaNacimiento}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md"
             required
@@ -186,12 +185,12 @@ export default function StudentForm({ student, onSubmit }: StudentFormProps) {
           />
         </div>
 
-        {/* Selects de ejemplo */}
+        {/* Selects */}
         <div>
           <label className="block text-sm font-medium mb-1">País</label>
           <select
-            name="id_pais"
-            value={formData.id_pais}
+            name="paisId"
+            value={formData.paisId}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md"
           >
@@ -203,8 +202,8 @@ export default function StudentForm({ student, onSubmit }: StudentFormProps) {
         <div>
           <label className="block text-sm font-medium mb-1">Localidad</label>
           <select
-            name="id_localidad"
-            value={formData.id_localidad}
+            name="localidadId"
+            value={formData.localidadId}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md"
           >
@@ -214,10 +213,12 @@ export default function StudentForm({ student, onSubmit }: StudentFormProps) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Área telefónica</label>
+          <label className="block text-sm font-medium mb-1">
+            Área Telefónica
+          </label>
           <select
-            name="id_area_telefonica"
-            value={formData.id_area_telefonica}
+            name="areaTelefonicaId"
+            value={formData.areaTelefonicaId}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md"
           >
@@ -229,8 +230,8 @@ export default function StudentForm({ student, onSubmit }: StudentFormProps) {
         <div>
           <label className="block text-sm font-medium mb-1">Género</label>
           <select
-            name="id_genero"
-            value={formData.id_genero}
+            name="generoId"
+            value={formData.generoId}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md"
           >
@@ -244,18 +245,18 @@ export default function StudentForm({ student, onSubmit }: StudentFormProps) {
         <div className="flex items-center space-x-2">
           <input
             type="checkbox"
-            name="examen_mayores25"
-            checked={formData.examen_mayores25}
+            name="examenMayores25"
+            checked={formData.examenMayores25}
             onChange={handleChange}
           />
-          <label>Examen mayores 25</label>
+          <label>Examen mayores de 25</label>
         </div>
 
         <div className="flex items-center space-x-2">
           <input
             type="checkbox"
-            name="solicito_beca"
-            checked={formData.solicito_beca}
+            name="solicitoBeca"
+            checked={formData.solicitoBeca}
             onChange={handleChange}
           />
           <label>Solicitó beca</label>
@@ -274,8 +275,8 @@ export default function StudentForm({ student, onSubmit }: StudentFormProps) {
         <div className="flex items-center space-x-2">
           <input
             type="checkbox"
-            name="persona_a_cargo"
-            checked={formData.persona_a_cargo}
+            name="personaACargo"
+            checked={formData.personaACargo}
             onChange={handleChange}
           />
           <label>Persona a cargo</label>
@@ -283,7 +284,9 @@ export default function StudentForm({ student, onSubmit }: StudentFormProps) {
 
         {/* Observaciones */}
         <div className="col-span-1 md:col-span-2">
-          <label className="block text-sm font-medium mb-1">Observaciones</label>
+          <label className="block text-sm font-medium mb-1">
+            Observaciones
+          </label>
           <textarea
             name="observaciones"
             value={formData.observaciones}
@@ -302,3 +305,4 @@ export default function StudentForm({ student, onSubmit }: StudentFormProps) {
     </form>
   );
 }
+

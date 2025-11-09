@@ -1,13 +1,34 @@
 // src/routes/studentRoutes.ts
-import { Router } from 'express';
-import * as studentController from '../controllers/studentController';
+import { Router } from "express";
+import * as studentController from "../controllers/studentController";
+import { authenticate, authorizeRoles } from "../middleware/authMiddleware"; 
 
 const router = Router();
 
-router.post('/', studentController.createStudent);      // RF 3.2.1.1
-router.get('/', studentController.getStudents);        // RF 3.2.1.2 (búsqueda por query)
-router.get('/:id', studentController.getStudentById);  // RF 3.2.1.2
-router.put('/:id', studentController.updateStudent);   // RF 3.2.1.3
-router.delete('/:id', studentController.deactivateStudent); // RF 3.2.1.4 (soft delete)
+// Crear estudiante (solo ADMIN o PERSONAL)
+router.post(
+  "/",
+  authenticate,
+  authorizeRoles("ADMIN", "PERSONAL"),
+  studentController.createStudent
+);
+
+router.post('/', studentController.createStudent);
+router.get('/', studentController.getStudents);
+router.get('/:id', studentController.getStudentById);
+router.put('/:id', studentController.updateStudent);
+router.delete('/:id', studentController.deactivateStudent);
+
+// Obtener todos los estudiantes o filtrar por query
+router.get("/", authenticate, authorizeRoles("ADMIN", "DOCENTE", "PERSONAL"), studentController.getStudents);
+
+// Obtener estudiante por ID
+router.get("/:id", authenticate, authorizeRoles("ADMIN", "DOCENTE", "PERSONAL"), studentController.getStudentById);
+
+// Actualizar estudiante
+router.put("/:id", authenticate, authorizeRoles("ADMIN", "PERSONAL"), studentController.updateStudent);
+
+// Desactivar (soft delete) estudiante
+router.delete("/:id", authenticate, authorizeRoles("ADMIN"), studentController.deactivateStudent);
 
 export default router;

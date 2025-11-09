@@ -1,25 +1,30 @@
-// This is your Prisma schema file.
-// Learn more: https://pris.ly/d/prisma-schema
-
+// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite" // Cambia a "postgresql" en producción
+  // En desarrollo usás sqlite; en producción cambia a "postgresql" y ajusta DATABASE_URL.
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-model Users {
+/* Usuarios / autenticación */
+model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
+  password  String   // contraseña hasheada
   name      String?
-  password  String
-  role      String   @default("user")
+  role      Role     @default(PERSONAL) // evitar DEFAULT ADMIN por seguridad
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  posts Posts[]
+
+  // Relaciones (logs, acciones)
+  createdInscripciones   Inscripcion[]      @relation("InscripcionCreadaPor")
+  createdCalificaciones  Cursada[]          @relation("CalificacionCreadaPor")
+  createdCondiciones     CondicionMateria[] @relation("CondicionCreadaPor")
+  auditLogs AuditLog[] // Relación inversa: un usuario puede tener muchos AuditLog
+  posts                  Posts[]            // Relación inversa: un usuario puede tener muchos Posts
 }
 
 model Posts {
@@ -30,11 +35,17 @@ model Posts {
   authorId  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  author Users @relation(fields: [authorId], references: [id])
+
+  author User @relation(fields: [authorId], references: [id])
 }
 
-// Enums
+/* Enums */
+enum Role {
+  ADMIN
+  DOCENTE
+  PERSONAL
+}
+
 enum EstadoEstudiante {
   Activo
   Inactivo
@@ -45,7 +56,7 @@ enum EstadoInscripcion {
   Inactiva
 }
 
-// Catálogos
+/* Catálogos geográficos / demográficos */
 model Pais {
   id          Int          @id @default(autoincrement())
   nombre      String       @unique
@@ -54,18 +65,18 @@ model Pais {
 }
 
 model Localidad {
-  id       Int          @id @default(autoincrement())
-  nombre   String
-  paisId   Int
-  pais     Pais         @relation(fields: [paisId], references: [id])
+  id          Int          @id @default(autoincrement())
+  nombre      String
+  paisId      Int
+  pais        Pais         @relation(fields: [paisId], references: [id], onDelete: Cascade)
   estudiantes Estudiante[]
 
   @@unique([nombre, paisId])
 }
 
 model AreaTelefonica {
-  id     Int          @id @default(autoincrement())
-  codigo String       @unique
+  id          Int          @id @default(autoincrement())
+  codigo      String       @unique
   estudiantes Estudiante[]
 }
 
@@ -76,87 +87,92 @@ model Genero {
 }
 
 model Condicion {
-  id                Int                    @id @default(autoincrement())
-  nombre            String                 @unique // Ej: "Regular", "Libre"
+  id                  Int                    @id @default(autoincrement())
+  nombre              String                 @unique // Ej: "Regular", "Libre"
+  descripcion         String?
   condicionesMaterias CondicionMateria[]
 }
 
-// Carreras y materias
+/* Carreras y materias */
 model Carrera {
-  id              Int          @id @default(autoincrement())
-  nombre          String       @unique
-  duracion        Int          // en años
-  tituloOtorgado  String 
-  materias        Materia[]
-  inscripciones   Inscripcion[]
+  id                  Int          @id @default(autoincrement())
+  nombre              String       @unique
+  duracion            Int          // en años
+  tituloOtorgado      String
+  materias            Materia[]
+  inscripciones       Inscripcion[]
   estudiantesCarreras EstudianteCarrera[]
 }
 
 model Materia {
-  id        Int          @id @default(autoincrement())
-  nombre    String
-  carreraId Int
-  carrera   Carrera      @relation(fields: [carreraId], references: [id])
-  cursadas  Cursada[]
-  condicionesMaterias CondicionMateria[]
+  id                   Int                  @id @default(autoincrement())
+  nombre               String
+  carreraId            Int
+  carrera              Carrera              @relation(fields: [carreraId], references: [id], onDelete: Cascade)
+  cursadas             Cursada[]
+  condicionesMaterias  CondicionMateria[]
 
   @@unique([nombre, carreraId])
 }
 
-// Estudiantes
+/* Estudiantes */
 model Estudiante {
-  id                Int               @id @default(autoincrement())
-  paisId            Int
-  localidadId       Int
-  areaTelefonicaId  Int
-  generoId          Int
+  id                 Int               @id @default(autoincrement())
+  paisId             Int
+  localidadId        Int
+  areaTelefonicaId   Int
+  generoId           Int
 
-  nombres           String
-  apellidos         String
-  dni               String            @unique
-  fechaNacimiento   DateTime
-  email             String
-  telefono          String
-  domicilio         String
-  fechaIngreso      DateTime          @default(now())
-  cohorte           String
-  secundario        String
-  cuil              String
-  examenMayores25   Boolean
-  solicitoBeca      Boolean
-  trabajador        Boolean
-  personaACargo     Boolean
-  observaciones     String?
-  estado            EstadoEstudiante  @default(Activo)
+  nombres            String
+  apellidos          String
+  dni                String            @unique
+  fechaNacimiento    DateTime
+  email              String
+  telefono           String
+  domicilio          String
+  fechaIngreso       DateTime          @default(now())
+  cohorte            String
+  secundario         String
+  cuil               String
+  examenMayores25    Boolean
+  solicitoBeca       Boolean
+  trabajador         Boolean
+  personaACargo      Boolean
+  observaciones      String?
+  estado             EstadoEstudiante  @default(Activo)
 
   // Relaciones
-  pais              Pais              @relation(fields: [paisId], references: [id])
-  localidad         Localidad         @relation(fields: [localidadId], references: [id])
-  areaTelefonica    AreaTelefonica    @relation(fields: [areaTelefonicaId], references: [id])
-  genero            Genero            @relation(fields: [generoId], references: [id])
+  pais               Pais              @relation(fields: [paisId], references: [id], onDelete: Restrict)
+  localidad          Localidad         @relation(fields: [localidadId], references: [id], onDelete: Restrict)
+  areaTelefonica     AreaTelefonica    @relation(fields: [areaTelefonicaId], references: [id], onDelete: Restrict)
+  genero             Genero            @relation(fields: [generoId], references: [id], onDelete: Restrict)
 
-  inscripciones     Inscripcion[]
+  inscripciones      Inscripcion[]
   estudiantesCarreras EstudianteCarrera[]
-  cursadas          Cursada[]
+  cursadas           Cursada[]
   condicionesMaterias CondicionMateria[]
 }
 
-// Inscripciones a carreras
+/* Inscripciones y histórico */
 model Inscripcion {
-  id                Int                 @id @default(autoincrement())
-  estudianteId      Int
-  carreraId         Int
-  fechaInscripcion  DateTime            @default(now())
-  estado            EstadoInscripcion   @default(Activa)
-  causaInactividad  String?
+  id               Int                 @id @default(autoincrement())
+  estudianteId     Int
+  carreraId        Int
+  fechaInscripcion DateTime            @default(now())
+  estado           EstadoInscripcion   @default(Activa)
+  causaInactividad String?
 
-  estudiante        Estudiante          @relation(fields: [estudianteId], references: [id])
-  carrera           Carrera             @relation(fields: [carreraId], references: [id])
+  estudiante       Estudiante          @relation(fields: [estudianteId], references: [id], onDelete: Cascade)
+  carrera          Carrera             @relation(fields: [carreraId], references: [id], onDelete: Cascade)
+
+  // opcional: quien creó la inscripcion
+  createdById      Int?
+  createdBy        User?               @relation("InscripcionCreadaPor", fields: [createdById], references: [id])
 
   @@unique([estudianteId, carreraId])
 }
 
-// Relación muchos a muchos entre estudiantes y carreras (histórico)
+/* Historico estudiante-carrera (desvinculaciones, múltiples altas) */
 model EstudianteCarrera {
   id            Int      @id @default(autoincrement())
   estudianteId  Int
@@ -164,50 +180,57 @@ model EstudianteCarrera {
   fechaAlta     DateTime @default(now())
   fechaBaja     DateTime?
 
-  estudiante    Estudiante @relation(fields: [estudianteId], references: [id])
-  carrera       Carrera    @relation(fields: [carreraId], references: [id])
+  estudiante    Estudiante @relation(fields: [estudianteId], references: [id], onDelete: Cascade)
+  carrera       Carrera    @relation(fields: [carreraId], references: [id], onDelete: Cascade)
 
   @@unique([estudianteId, carreraId])
 }
 
-// Calificaciones (cursadas)
+/* Calificaciones / cursadas */
 model Cursada {
   id            Int      @id @default(autoincrement())
   estudianteId  Int
   materiaId     Int
-  notaFinal     Float?   // SQLite no soporta DECIMAL → usar Float
+  notaFinal     Float?   // SQLite usa Float; en Postgres podés usar Decimal
 
-  estudiante    Estudiante @relation(fields: [estudianteId], references: [id])
-  materia       Materia    @relation(fields: [materiaId], references: [id])
+  estudiante    Estudiante @relation(fields: [estudianteId], references: [id], onDelete: Cascade)
+  materia       Materia    @relation(fields: [materiaId], references: [id], onDelete: Cascade)
+
+  createdById   Int?
+  createdBy     User?      @relation("CalificacionCreadaPor", fields: [createdById], references: [id])
 
   @@unique([estudianteId, materiaId])
 }
 
-// Condiciones académicas por materia
+/* Condiciones académicas por materia */
 model CondicionMateria {
   id            Int      @id @default(autoincrement())
   estudianteId  Int
   materiaId     Int
   condicionId   Int
+  fechaAsignada DateTime @default(now())
+  observaciones String?
 
-  estudiante    Estudiante @relation(fields: [estudianteId], references: [id])
-  materia       Materia    @relation(fields: [materiaId], references: [id])
-  condicion     Condicion  @relation(fields: [condicionId], references: [id])
+  estudiante    Estudiante @relation(fields: [estudianteId], references: [id], onDelete: Cascade)
+  materia       Materia    @relation(fields: [materiaId], references: [id], onDelete: Cascade)
+  condicion     Condicion  @relation(fields: [condicionId], references: [id], onDelete: Restrict)
+
+  createdById   Int?
+  createdBy     User?      @relation("CondicionCreadaPor", fields: [createdById], references: [id])
 
   @@unique([estudianteId, materiaId])
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String   // contraseña hasheada
-  role      Role     @default(ADMIN)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+/* Tabla de auditoría para operaciones críticas */
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  usuarioId  Int?
+  accion     String
+  entidad    String
+  entidadId  Int?
+  detalle    Json?
+  ip         String?
+  createdAt  DateTime @default(now())
 
-enum Role {
-  ADMIN
-  DOCENTE
-  PERSONAL
+  usuario    User?    @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
 }

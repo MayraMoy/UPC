@@ -1,47 +1,52 @@
-// src/controllers/authController.ts
-import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
-import { generateToken } from '../utils/jwt';
-import prisma from '../prisma';
+import { Request, Response } from "express";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import  prisma  from "../prisma";
 
-// Login
+const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
+
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email y contraseña son obligatorios' });
-    }
+    if (!email || !password)
+      return res.status(400).json({ error: "Email y contraseña son obligatorios" });
 
-    // Buscar usuario
-    const user = await prisma.users.findUnique({ where: { email } });
-    if (!user) {
-      return res.status(401).json({ error: 'Credenciales incorrectas' });
-    }
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user)
+      return res.status(401).json({ error: "Credenciales incorrectas" });
 
-    // Verificar contraseña
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Credenciales incorrectas' });
-    }
+    if (!isMatch)
+      return res.status(401).json({ error: "Credenciales incorrectas" });
 
-    // Generar token
-    const token = generateToken({ id: user.id, role: user.role });
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "8h" }
+    );
 
-    // Log de auditoría (3.3.2)
-    console.log(`[AUDIT] Usuario autenticado: ${user.email} (Rol: ${user.role})`);
-
-    // Responder sin la contraseña
     const { password: _, ...userWithoutPassword } = user;
-    return res.json({ token, user: userWithoutPassword });
+    console.log(`[AUDIT] Login exitoso: ${user.email} (${user.role})`);
+
+    return res.status(200).json({
+      message: "Autenticación exitosa",
+      token,
+      user: userWithoutPassword,
+    });
   } catch (error) {
-    console.error('Error en login:', error);
-    return res.status(500).json({ error: 'Error interno del servidor' });
+    console.error("Error en login:", error);
+    return res.status(500).json({ error: "Error interno del servidor" });
   }
 };
 
-// Logout (opcional, solo frontend)
-export const logout = async (req: Request, res: Response) => {
-  // En JWT stateless, el logout se maneja en frontend (borrar token)
-  return res.json({ message: 'Sesión cerrada' });
+export const logout = async (_req: Request, res: Response) => {
+  try {
+    // En JWT, el logout se maneja del lado del cliente.
+    // Pero respondemos OK para mantener la API REST completa.
+    return res.status(200).json({ message: "Sesión cerrada correctamente" });
+  } catch (error) {
+    console.error("Error en logout:", error);
+    return res.status(500).json({ error: "Error al cerrar sesión" });
+  }
 };
