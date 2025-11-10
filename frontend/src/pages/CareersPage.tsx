@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { Dialog } from '@headlessui/react';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { CareerService } from '../services/careerService';
 import type { Career, CreateCareerDto } from '../services/careerService';
 import CareerList from '../components/careers/CareerList';
@@ -52,16 +54,36 @@ export default function CareersPage() {
     setShowForm(true);
   };
 
-  // Eliminar carrera
-  const handleDelete = async (id: number) => {
-    if (!confirm('¿Seguro que deseas eliminar esta carrera?')) return;
+  // Estados para el diálogo de confirmación
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [careerToDelete, setCareerToDelete] = useState<number | null>(null);
+
+  // Manejar clic en eliminar
+  const handleDeleteClick = (id: number) => {
+    setCareerToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Confirmar eliminación
+  const confirmDelete = async () => {
+    if (careerToDelete === null) return;
+    
     try {
-      await CareerService.delete(id);
+      await CareerService.delete(careerToDelete);
       await fetchCareers();
+      setIsDeleteDialogOpen(false);
+      setCareerToDelete(null);
     } catch (err) {
       console.error('Error al eliminar carrera:', err);
       setError('No se pudo eliminar la carrera');
+      setIsDeleteDialogOpen(false);
     }
+  };
+
+  // Cancelar eliminación
+  const cancelDelete = () => {
+    setIsDeleteDialogOpen(false);
+    setCareerToDelete(null);
   };
 
   // Cancelar formulario
@@ -92,7 +114,7 @@ export default function CareersPage() {
           {loading ? (
             <p className="text-gray-600">Cargando carreras...</p>
           ) : (
-            <CareerList careers={careers} onEdit={handleEdit} onDelete={handleDelete} />
+            <CareerList careers={careers} onEdit={handleEdit} onDelete={handleDeleteClick} />
           )}
         </>
       ) : (
@@ -102,6 +124,48 @@ export default function CareersPage() {
           onCancel={handleCancel}
         />
       )}
+
+      {/* Diálogo de confirmación de eliminación */}
+      <Dialog
+        open={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      >
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+        <div className="bg-white rounded-lg max-w-md w-full p-6 relative">
+          <div className="sm:flex sm:items-start">
+            <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+              <ExclamationTriangleIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
+            </div>
+            <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+              <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
+                Eliminar carrera
+              </Dialog.Title>
+              <div className="mt-2">
+                <p className="text-sm text-gray-500">
+                  ¿Estás seguro de que quieres eliminar esta carrera? Esta acción no se puede deshacer.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+            <button
+              type="button"
+              className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+              onClick={confirmDelete}
+            >
+              Eliminar
+            </button>
+            <button
+              type="button"
+              className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+              onClick={cancelDelete}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }
