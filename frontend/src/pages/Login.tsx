@@ -35,7 +35,7 @@ export default function Login() {
     
     try {
       await login(email, password);
-      navigate('/students'); // Ruta funcional
+      navigate('/dashboard'); // Ruta funcional
     } catch (err) {
       setError('Credenciales incorrectas. Contacta al administrador del sistema.');
     } finally {
