@@ -1,4 +1,8 @@
-// frontend/src/pages/CareersPage.tsx
+import { useState, useEffect } from 'react';
+import { CareerService } from '../services/careerService';
+import type { Career, CreateCareerDto } from '../services/careerService';
+import CareerList from '../components/careers/CareerList';
+import CareerForm from '../components/careers/CareerForm';
 
 export default function CareersPage() {
   const [careers, setCareers] = useState<Career[]>([]);
