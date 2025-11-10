@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import studentRoutes from './routes/studentRoutes';
 import careerRoutes from './routes/careerRoutes';
 import authRoutes from './routes/authRoutes';
+import paisRoutes from './routes/paisRoutes';
+import localidadRoutes from './routes/localidadRoutes';
 
 dotenv.config();
 
@@ -16,6 +18,8 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/careers', careerRoutes);
+app.use('/api/paises', paisRoutes);
+app.use('/api/localidades', localidadRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
