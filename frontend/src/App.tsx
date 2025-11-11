@@ -7,6 +7,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import CareersPage from './pages/CareersPage';
 import NewStudentPage from './pages/NewStudentPage'; 
 import DashboardPage from './pages/DashboardPage';
+import CountryPage from './pages/CountryPage';
+import LocalidadesPage from './pages/LocalidadesPage';
 
 function App() {
   return (
@@ -31,6 +33,12 @@ function App() {
           {/* Solo ADMIN */}
           <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
             <Route path="/careers" element={<CareersPage />} />
+          </Route>
+          <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+            <Route path="/paises" element={<CountryPage />} />
+          </Route>
+          <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'PERSONAL']} />}>
+            <Route path="/localidades" element={<LocalidadesPage />} />
           </Route>
         </Routes>
       </Layout>

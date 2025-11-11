@@ -1,3 +1,4 @@
+// src/services/countryService.ts
 import axios from 'axios';
 
 // Tipos principales
@@ -25,32 +26,32 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Servicio de carreras
-export const CareerService = {
-  // Obtener todas las carreras
+// Servicio de países
+export const CountryService = {
+  // Obtener todos los países
   getAll() {
-    return api.get<Country[]>('/countries');
+    return api.get<Country[]>('/paises');
   },
 
-  // Obtener carrera por ID
+  // Obtener país por ID
   getById(id: number) {
-    return api.get<Country>(`/careers/${id}`);
+    return api.get<Country>(`/paises/${id}`);
   },
 
-  // Crear nueva carrera
+  // Crear nuevo país
   create(data: CreateCountryDto) {
-    return api.post<Country>('/countries', data);
+    return api.post<Country>('/paises', data);
   },
 
-  // Actualizar carrera existente
+  // Actualizar país existente
   update(id: number, data: Partial<CreateCountryDto>) {
-    return api.put<Country>(`/countries/${id}`, data);
+    return api.put<Country>(`/paises/${id}`, data);
   },
 
-  // Eliminar carrera
+  // Eliminar país
   delete(id: number) {
-    return api.delete(`/countries/${id}`);
+    return api.delete(`/paises/${id}`);
   },
 };
 
-export default CareerService;
+export default CountryService;

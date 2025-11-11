@@ -70,11 +70,18 @@ export default function DashboardPage() {
       roles: ['ADMIN'],
     },
     {
-      title: 'Paises y Ciudades',
-      description: 'Administrar la lista de países y ciudades.',
+      title: 'Paises',
+      description: 'Administrar la lista de países.',
       icon: '🌍',
-      path: '/countries',
+      path: '/paises',
       roles: ['ADMIN'],
+    },
+    {
+      title: 'Localidades',
+      description: 'Administrar la lista de localidades.',
+      icon: '🌍',
+      path: '/localidades',
+      roles: ['ADMIN']
     }
   ];
 
@@ -124,7 +131,7 @@ export default function DashboardPage() {
                 <p className="text-gray-600 text-sm">{mod.description}</p>
               </div>
               <div className="mt-4">
-                <button className="w-full py-2 px-4 bg-[#cfa271] text-white font-medium rounded-lg hover:bg-[#d99733] transition">
+                <button className="w-full py-2 px-4 bg-[#1e40af] text-white font-medium rounded-lg hover:bg-[#d99733] transition">
                   Ir al módulo →
                 </button>
               </div>

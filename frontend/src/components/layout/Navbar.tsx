@@ -20,12 +20,6 @@ export default function Navbar() {
         <div className="flex items-center space-x-6">
           {user ? (
             <>
-              <Link 
-                to="/students" 
-                className="text-black hover:text-gray-700 transition-colors duration-200"
-              >
-                Gestión de Estudiantes
-              </Link>
               <button 
                 onClick={() => navigate('/profile')}
                 className="text-black hover:text-gray-700 transition-colors duration-200"
