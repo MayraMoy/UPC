@@ -1,6 +1,6 @@
 Miembros:
 
-
+Usuario: admin@upc.edu.ar y contraseña: admin123
 
 Tiago
 Narciso Perez
