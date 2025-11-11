@@ -58,7 +58,7 @@ export default function CareersPage() {
 
   // Eliminar carrera
   const handleDelete = async (id: number) => {
-    if (!confirm('¿Seguro que deseas eliminar esta carrera?')) return;
+    if (!window.confirm('¿Seguro que deseas eliminar esta carrera?')) return;
     try {
       await CareerService.delete(id);
       await fetchCareers();
