@@ -3,6 +3,8 @@ import { CareerService } from '../services/careerService';
 import type { Career, CreateCareerDto } from '../services/careerService';
 import CareerList from '../components/careers/CareerList';
 import CareerForm from '../components/careers/CareerForm';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function CareersPage() {
   const [careers, setCareers] = useState<Career[]>([]);
@@ -10,6 +12,8 @@ export default function CareersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const navigate = useNavigate();
+
 
   // Cargar carreras
   const fetchCareers = async () => {
@@ -72,6 +76,14 @@ export default function CareersPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+
+      <button
+        onClick={() => navigate('/dashboard')}
+        className="mb-4 px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition"
+      >
+        ← Volver al Dashboard
+      </button>
+
       <h1 className="text-2xl font-bold mb-6 text-primary">Gestión de Carreras</h1>
 
       {error && (

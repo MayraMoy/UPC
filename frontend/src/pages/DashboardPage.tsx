@@ -70,11 +70,18 @@ export default function DashboardPage() {
       roles: ['ADMIN'],
     },
     {
-      title: 'Paises y Ciudades',
-      description: 'Administrar la lista de países y ciudades.',
+      title: 'Paises',
+      description: 'Administrar la lista de países.',
       icon: '🌍',
-      path: '/countries',
+      path: '/paises',
       roles: ['ADMIN'],
+    },
+    {
+      title: 'Localidades',
+      description: 'Administrar la lista de localidades.',
+      icon: '🌍',
+      path: '/localidades',
+      roles: ['ADMIN']
     }
   ];
 

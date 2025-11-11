@@ -3,6 +3,7 @@ import { StudentService, type Estudiante } from '../services/api';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+
 export default function StudentsPage() {
   const { user, loading: authLoading } = useAuth();
   const [students, setStudents] = useState<Estudiante[]>([]);
@@ -72,6 +73,13 @@ export default function StudentsPage() {
     <div className="container mx-auto px-4 py-8">
       {/* Encabezado */}
       <div className="flex justify-between items-center mb-6">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="mb-4 px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition"
+        >
+        ← Volver al Dashboard
+        </button>
+
         <h1 className="text-2xl font-bold text-primary">Gestión de Estudiantes</h1>
         <button 
           className="btn-primary"
