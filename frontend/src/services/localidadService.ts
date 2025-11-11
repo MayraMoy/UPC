@@ -1,5 +1,7 @@
+// src/services/localidadService.ts
 import axios from 'axios';
 
+// Tipos principales
 export interface Localidad {
   id: number;
   nombre: string;
@@ -13,6 +15,16 @@ export interface CreateLocalidadDto {
 
 const api = axios.create({
   baseURL: 'http://localhost:5000/api',
+  timeout: 10000,
+});
+
+// Interceptor de autenticación
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export const LocalidadService = {

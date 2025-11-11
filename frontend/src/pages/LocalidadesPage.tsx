@@ -1,3 +1,4 @@
+// src/pages/LocalidadesPage.tsx
 import React, { useEffect, useState } from 'react';
 import { LocalidadService, type Localidad, type CreateLocalidadDto } from '../services/localidadService';
 import LocalidadList from '../components/localidad/LocalidadList';

@@ -16,6 +16,7 @@ router.get("/:id", localidadController.getLocalidadById);
 
 // POST /api/localidades - Crear una nueva localidad
 router.post("/", authenticate, authorizeRoles("ADMIN", "DOCENTE", "PERSONAL"), localidadController.createLocalidad);
+//router.post("/", localidadController.createLocalidad);
 
 // PUT /api/localidades/:id - Actualizar una localidad
 router.put("/:id", authenticate, authorizeRoles("ADMIN", "DOCENTE", "PERSONAL"), localidadController.updateLocalidad);
