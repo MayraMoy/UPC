@@ -1,48 +1,9 @@
 import { Request, Response } from "express";
-import prisma from "../prisma";
+import { PrismaClient } from "@prisma/client";
 
-export const getStudents = async (_req: Request, res: Response) => {
-  try {
-    const students = await prisma.estudiante.findMany({
-      include: {
-        pais: true,
-        localidad: true,
-        genero: true,
-        areaTelefonica: true,
-      },
-      orderBy: { apellidos: "asc" },
-      take: 100, // evita cargar demasiados
-    });
-    return res.json(students);
-  } catch (error) {
-    console.error("Error al obtener estudiantes:", error);
-    return res.status(500).json({ error: "Error interno del servidor" });
-  }
-};
+const prisma = new PrismaClient();
 
-export const getStudentById = async (req: Request, res: Response) => {
-  try {
-    const id = Number(req.params.id);
-    const student = await prisma.estudiante.findUnique({
-      where: { id },
-      include: {
-        pais: true,
-        localidad: true,
-        genero: true,
-        areaTelefonica: true,
-      },
-    });
-
-    if (!student)
-      return res.status(404).json({ error: "Estudiante no encontrado" });
-
-    return res.json(student);
-  } catch (error) {
-    console.error("Error al buscar estudiante:", error);
-    return res.status(500).json({ error: "Error interno del servidor" });
-  }
-};
-
+// 🧩 Crear estudiante
 export const createStudent = async (req: Request, res: Response) => {
   try {
     const {
@@ -61,17 +22,43 @@ export const createStudent = async (req: Request, res: Response) => {
       trabajador,
       personaACargo,
       observaciones,
-      paisId,
-      localidadId,
-      areaTelefonicaId,
-      generoId,
+      paisNombre,
+      localidadNombre,
+      generoNombre,
+      areaTelefonicaCodigo,
     } = req.body;
 
-    const existing = await prisma.estudiante.findUnique({ where: { dni } });
-    if (existing)
-      return res.status(400).json({ error: "Ya existe un estudiante con ese DNI" });
+    // Buscar relaciones por nombre o código
+    const pais = await prisma.pais.findUnique({ where: { nombre: paisNombre } });
+    const genero = await prisma.genero.findUnique({ where: { nombre: generoNombre } });
+    const areaTelefonica = await prisma.areaTelefonica.findUnique({
+      where: { codigo: areaTelefonicaCodigo },
+    });
 
-    const student = await prisma.estudiante.create({
+    if (!pais || !genero || !areaTelefonica) {
+      return res
+        .status(400)
+        .json({ message: "País, género o área telefónica no válidos." });
+    }
+
+    // Buscar localidad por nombre y país
+    const localidad = await prisma.localidad.findFirst({
+      where: {
+        nombre: localidadNombre,
+        paisId: pais.id,
+      },
+    });
+
+    if (!localidad) {
+      return res
+        .status(400)
+        .json({
+          message: "La localidad no existe o no pertenece al país indicado.",
+        });
+    }
+
+    // Crear estudiante
+    const nuevoEstudiante = await prisma.estudiante.create({
       data: {
         nombres,
         apellidos,
@@ -83,57 +70,177 @@ export const createStudent = async (req: Request, res: Response) => {
         cohorte,
         secundario,
         cuil,
-        examenMayores25: Boolean(examenMayores25),
-        solicitoBeca: Boolean(solicitoBeca),
-        trabajador: Boolean(trabajador),
-        personaACargo: Boolean(personaACargo),
+        examenMayores25,
+        solicitoBeca,
+        trabajador,
+        personaACargo,
         observaciones,
-        paisId: Number(paisId),
-        localidadId: Number(localidadId),
-        areaTelefonicaId: Number(areaTelefonicaId),
-        generoId: Number(generoId),
+        paisId: pais.id,
+        localidadId: localidad.id,
+        generoId: genero.id,
+        areaTelefonicaId: areaTelefonica.id,
       },
     });
 
-    console.log(`[AUDIT] Estudiante creado: ${student.apellidos}, ${student.nombres}`);
-    return res.status(201).json(student);
+    return res.status(201).json(nuevoEstudiante);
   } catch (error) {
-    console.error("Error al crear estudiante:", error);
-    return res.status(500).json({ error: "Error interno del servidor" });
+    console.error("❌ Error al crear estudiante:", error);
+    return res.status(500).json({ message: "Error interno del servidor." });
   }
 };
 
+// 🧩 Actualizar estudiante
 export const updateStudent = async (req: Request, res: Response) => {
   try {
-    const id = Number(req.params.id);
-    const { nombres, apellidos, email, telefono, domicilio, observaciones } = req.body;
+    const { id } = req.params;
+    const {
+      nombres,
+      apellidos,
+      dni,
+      fechaNacimiento,
+      email,
+      telefono,
+      domicilio,
+      cohorte,
+      secundario,
+      cuil,
+      examenMayores25,
+      solicitoBeca,
+      trabajador,
+      personaACargo,
+      observaciones,
+      paisNombre,
+      localidadNombre,
+      generoNombre,
+      areaTelefonicaCodigo,
+    } = req.body;
 
-    const existing = await prisma.estudiante.findUnique({ where: { id } });
-    if (!existing)
-      return res.status(404).json({ error: "Estudiante no encontrado" });
-
-    const updated = await prisma.estudiante.update({
-      where: { id },
-      data: { nombres, apellidos, email, telefono, domicilio, observaciones },
+    const estudiante = await prisma.estudiante.findUnique({
+      where: { id: Number(id) },
     });
 
-    console.log(`[AUDIT] Estudiante actualizado: ${updated.apellidos}, ${updated.nombres}`);
-    return res.json(updated);
+    if (!estudiante) {
+      return res.status(404).json({ message: "Estudiante no encontrado." });
+    }
+
+    const pais = await prisma.pais.findUnique({ where: { nombre: paisNombre } });
+    const genero = await prisma.genero.findUnique({ where: { nombre: generoNombre } });
+    const areaTelefonica = await prisma.areaTelefonica.findUnique({
+      where: { codigo: areaTelefonicaCodigo },
+    });
+
+    if (!pais || !genero || !areaTelefonica) {
+      return res
+        .status(400)
+        .json({ message: "País, género o área telefónica no válidos." });
+    }
+
+    const localidad = await prisma.localidad.findFirst({
+      where: {
+        nombre: localidadNombre,
+        paisId: pais.id,
+      },
+    });
+
+    if (!localidad) {
+      return res
+        .status(400)
+        .json({
+          message: "La localidad no existe o no pertenece al país indicado.",
+        });
+    }
+
+    const estudianteActualizado = await prisma.estudiante.update({
+      where: { id: Number(id) },
+      data: {
+        nombres,
+        apellidos,
+        dni,
+        fechaNacimiento: new Date(fechaNacimiento),
+        email,
+        telefono,
+        domicilio,
+        cohorte,
+        secundario,
+        cuil,
+        examenMayores25,
+        solicitoBeca,
+        trabajador,
+        personaACargo,
+        observaciones,
+        paisId: pais.id,
+        localidadId: localidad.id,
+        generoId: genero.id,
+        areaTelefonicaId: areaTelefonica.id,
+      },
+    });
+
+    return res.json(estudianteActualizado);
   } catch (error) {
-    console.error("Error al actualizar estudiante:", error);
-    return res.status(500).json({ error: "Error interno del servidor" });
+    console.error("❌ Error al actualizar estudiante:", error);
+    return res.status(500).json({ message: "Error interno del servidor." });
   }
 };
 
+// 🧩 Obtener todos los estudiantes
+export const getStudents = async (req: Request, res: Response) => {
+  try {
+    const estudiantes = await prisma.estudiante.findMany({
+      include: {
+        pais: true,
+        localidad: true,
+        genero: true,
+        areaTelefonica: true,
+      },
+    });
+    return res.json(estudiantes);
+  } catch (error) {
+    console.error("❌ Error al obtener estudiantes:", error);
+    return res.status(500).json({ message: "Error interno del servidor." });
+  }
+};
+
+// 🧩 Obtener un estudiante por ID
+export const getStudentById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const estudiante = await prisma.estudiante.findUnique({
+      where: { id: Number(id) },
+      include: {
+        pais: true,
+        localidad: true,
+        genero: true,
+        areaTelefonica: true,
+      },
+    });
+
+    if (!estudiante) {
+      return res.status(404).json({ message: "Estudiante no encontrado." });
+    }
+
+    return res.json(estudiante);
+  } catch (error) {
+    console.error("❌ Error al obtener estudiante:", error);
+    return res.status(500).json({ message: "Error interno del servidor." });
+  }
+};
+
+// 🧩 Desactivar estudiante
 export const deactivateStudent = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+
     const estudiante = await prisma.estudiante.update({
       where: { id: Number(id) },
-      data: { estado: 'Inactivo' },
+      data: { estado: "Inactivo" },
     });
-    res.json(estudiante);
+
+    return res.json({
+      message: "✅ Estudiante desactivado correctamente.",
+      estudiante,
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar el estudiante' });
+    console.error("❌ Error al desactivar estudiante:", error);
+    return res.status(500).json({ message: "Error interno del servidor." });
   }
 };

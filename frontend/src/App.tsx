@@ -9,6 +9,7 @@ import NewStudentPage from './pages/NewStudentPage';
 import DashboardPage from './pages/DashboardPage';
 import CountryPage from './pages/CountryPage';
 import LocalidadesPage from './pages/LocalidadesPage';
+import MateriasPage from './pages/MateriasPage';
 
 function App() {
   return (
@@ -39,6 +40,9 @@ function App() {
           </Route>
           <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'PERSONAL']} />}>
             <Route path="/localidades" element={<LocalidadesPage />} />
+          </Route>
+          <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'DOCENTE']} />}>
+            <Route path="/materias" element={<MateriasPage />} />
           </Route>
         </Routes>
       </Layout>

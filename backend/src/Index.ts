@@ -8,6 +8,7 @@ import careerRoutes from './routes/careerRoutes';
 import authRoutes from './routes/authRoutes';
 import paisRoutes from './routes/paisRoutes';
 import localidadRoutes from './routes/localidadRoutes';
+import materiaRoutes from './routes/materiaRoutes';
 
 // Importar rutas
 //import userRoutes from './apis/userRoutes';
@@ -33,6 +34,7 @@ app.use('/api/students', studentRoutes);
 app.use('/api/careers', careerRoutes);
 app.use('/api/paises', paisRoutes);
 app.use('/api/localidades', localidadRoutes);
+app.use('/api/materias', materiaRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 // Ruta de salud

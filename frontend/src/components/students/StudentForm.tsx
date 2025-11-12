@@ -1,308 +1,263 @@
-import React, { useState } from 'react';
-import type { CreateEstudianteDto, Estudiante } from '../../services/api';
+import { useState, useEffect } from "react";
+import type { CreateEstudianteDto } from "../../services/studentService";
+import {
+  getPaises,
+  getLocalidades,
+  getGeneros,
+  getAreasTelefonicas,
+} from "../../services/studentService";
 
 interface StudentFormProps {
-  student?: Estudiante;
-  onSubmit: (data: CreateEstudianteDto) => void;
+  onSubmit: (data: CreateEstudianteDto) => Promise<void>;
+  initialData?: CreateEstudianteDto | undefined; // ✅ ahora acepta undefined
+  onCancel: () => void;
 }
 
-export default function StudentForm({ student, onSubmit }: StudentFormProps) {
-  const [formData, setFormData] = useState<CreateEstudianteDto>({
-    nombres: student?.nombres ?? '',
-    apellidos: student?.apellidos ?? '',
-    dni: student?.dni ?? '',
-    email: student?.email ?? '',
-    telefono: student?.telefono ?? '',
-    domicilio: student?.domicilio ?? '',
-    fechaNacimiento: student?.fechaNacimiento?.split('T')[0] ?? '',
-    paisId: student?.paisId ?? 1,
-    localidadId: student?.localidadId ?? 1,
-    areaTelefonicaId: student?.areaTelefonicaId ?? 1,
-    generoId: student?.generoId ?? 1,
-    cohorte: student?.cohorte ?? '',
-    secundario: student?.secundario ?? '',
-    cuil: student?.cuil ?? '',
-    examenMayores25: student?.examenMayores25 ?? false,
-    solicitoBeca: student?.solicitoBeca ?? false,
-    trabajador: student?.trabajador ?? false,
-    personaACargo: student?.personaACargo ?? false,
-    observaciones: student?.observaciones ?? '',
-  });
+
+const StudentForm: React.FC<StudentFormProps> = ({
+  onSubmit,
+  initialData,
+  onCancel,
+}) => {
+  const [formData, setFormData] = useState<CreateEstudianteDto>(
+    initialData || {
+      nombres: "",
+      apellidos: "",
+      dni: "",
+      fechaNacimiento: "",
+      email: "",
+      telefono: "",
+      domicilio: "",
+      cohorte: "",
+      secundario: "",
+      cuil: "",
+      examenMayores25: false,
+      solicitoBeca: false,
+      trabajador: false,
+      personaACargo: false,
+      observaciones: "",
+      paisNombre: "",
+      localidadNombre: "",
+      generoNombre: "",
+      areaTelefonicaCodigo: "",
+    }
+  );
+
+  const [paises, setPaises] = useState<any[]>([]);
+  const [localidades, setLocalidades] = useState<any[]>([]);
+  const [generos, setGeneros] = useState<any[]>([]);
+  const [areas, setAreas] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [p, l, g, a] = await Promise.all([
+        getPaises(),
+        getLocalidades(),
+        getGeneros(),
+        getAreasTelefonicas(),
+      ]);
+      setPaises(p);
+      setLocalidades(l);
+      setGeneros(g);
+      setAreas(a);
+    };
+    fetchData();
+  }, []);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
-    const { name, type, value } = e.target;
-    const val =
-      type === 'checkbox' && e.target instanceof HTMLInputElement
-        ? e.target.checked
-        : value;
-
-    setFormData((prev) => ({ ...prev, [name]: val }));
+    const { name, value, type } = e.target;
+    const input = e.target as HTMLInputElement;
+    const newValue = type === "checkbox" ? input.checked : value;
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    await onSubmit(formData);
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="card max-w-3xl mx-auto p-6 shadow-md rounded-md bg-white"
+      className="bg-white p-6 rounded-xl shadow-md space-y-4"
     >
-      <h2 className="text-2xl font-bold mb-6 text-primary">
-        {student ? 'Editar Estudiante' : 'Registrar Estudiante'}
-      </h2>
+      <h2 className="text-lg font-semibold text-gray-700">Registrar Estudiante</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Nombres */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Nombres *</label>
-          <input
-            type="text"
-            name="nombres"
-            value={formData.nombres}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-
-        {/* Apellidos */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Apellidos *</label>
-          <input
-            type="text"
-            name="apellidos"
-            value={formData.apellidos}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-
-        {/* DNI */}
-        <div>
-          <label className="block text-sm font-medium mb-1">DNI *</label>
-          <input
-            type="text"
-            name="dni"
-            value={formData.dni}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-
-        {/* Email */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Email *</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-
-        {/* Fecha de nacimiento */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Fecha de Nacimiento *
-          </label>
-          <input
-            type="date"
-            name="fechaNacimiento"
-            value={formData.fechaNacimiento}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-
-        {/* CUIL */}
-        <div>
-          <label className="block text-sm font-medium mb-1">CUIL</label>
-          <input
-            type="text"
-            name="cuil"
-            value={formData.cuil}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-          />
-        </div>
-
-        {/* Teléfono */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Teléfono</label>
-          <input
-            type="text"
-            name="telefono"
-            value={formData.telefono}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-          />
-        </div>
-
-        {/* Domicilio */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Domicilio</label>
-          <input
-            type="text"
-            name="domicilio"
-            value={formData.domicilio}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-          />
-        </div>
-
-        {/* Cohorte */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Cohorte</label>
-          <input
-            type="text"
-            name="cohorte"
-            value={formData.cohorte}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-          />
-        </div>
-
-        {/* Secundario */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Secundario</label>
-          <input
-            type="text"
-            name="secundario"
-            value={formData.secundario}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-          />
-        </div>
+      <div className="grid grid-cols-2 gap-4">
+        <input
+          name="nombres"
+          value={formData.nombres}
+          onChange={handleChange}
+          placeholder="Nombres"
+          className="border p-2 rounded"
+        />
+        <input
+          name="apellidos"
+          value={formData.apellidos}
+          onChange={handleChange}
+          placeholder="Apellidos"
+          className="border p-2 rounded"
+        />
+        <input
+          name="dni"
+          value={formData.dni}
+          onChange={handleChange}
+          placeholder="DNI"
+          className="border p-2 rounded"
+        />
+        <input
+          type="date"
+          name="fechaNacimiento"
+          value={formData.fechaNacimiento}
+          onChange={handleChange}
+          className="border p-2 rounded"
+        />
+        <input
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Email"
+          className="border p-2 rounded"
+        />
+        <input
+          name="telefono"
+          value={formData.telefono}
+          onChange={handleChange}
+          placeholder="Teléfono"
+          className="border p-2 rounded"
+        />
+        <input
+          name="domicilio"
+          value={formData.domicilio}
+          onChange={handleChange}
+          placeholder="Domicilio"
+          className="border p-2 rounded"
+        />
+        <input
+          name="cohorte"
+          value={formData.cohorte}
+          onChange={handleChange}
+          placeholder="Cohorte"
+          className="border p-2 rounded"
+        />
+        <input
+          name="secundario"
+          value={formData.secundario}
+          onChange={handleChange}
+          placeholder="Secundario"
+          className="border p-2 rounded"
+        />
+        <input
+          name="cuil"
+          value={formData.cuil}
+          onChange={handleChange}
+          placeholder="CUIL"
+          className="border p-2 rounded"
+        />
 
         {/* Selects */}
-        <div>
-          <label className="block text-sm font-medium mb-1">País</label>
-          <select
-            name="paisId"
-            value={formData.paisId}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-          >
-            <option value={1}>Argentina</option>
-            <option value={2}>Brasil</option>
-          </select>
-        </div>
+        <select
+          name="paisNombre"
+          value={formData.paisNombre}
+          onChange={handleChange}
+          className="border p-2 rounded"
+        >
+          <option value="">Seleccione país</option>
+          {paises.map((p) => (
+            <option key={p.id} value={p.nombre}>
+              {p.nombre}
+            </option>
+          ))}
+        </select>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Localidad</label>
-          <select
-            name="localidadId"
-            value={formData.localidadId}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-          >
-            <option value={1}>Córdoba</option>
-            <option value={2}>Rosario</option>
-          </select>
-        </div>
+        <select
+          name="localidadNombre"
+          value={formData.localidadNombre}
+          onChange={handleChange}
+          className="border p-2 rounded"
+        >
+          <option value="">Seleccione localidad</option>
+          {localidades.map((l) => (
+            <option key={l.id} value={l.nombre}>
+              {l.nombre}
+            </option>
+          ))}
+        </select>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Área Telefónica
-          </label>
-          <select
-            name="areaTelefonicaId"
-            value={formData.areaTelefonicaId}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-          >
-            <option value={1}>+54</option>
-            <option value={2}>+55</option>
-          </select>
-        </div>
+        <select
+          name="generoNombre"
+          value={formData.generoNombre}
+          onChange={handleChange}
+          className="border p-2 rounded"
+        >
+          <option value="">Seleccione género</option>
+          {generos.map((g) => (
+            <option key={g.id} value={g.nombre}>
+              {g.nombre}
+            </option>
+          ))}
+        </select>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Género</label>
-          <select
-            name="generoId"
-            value={formData.generoId}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-          >
-            <option value={1}>Femenino</option>
-            <option value={2}>Masculino</option>
-            <option value={3}>Otro</option>
-          </select>
-        </div>
-
-        {/* Checkboxes */}
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            name="examenMayores25"
-            checked={formData.examenMayores25}
-            onChange={handleChange}
-          />
-          <label>Examen mayores de 25</label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            name="solicitoBeca"
-            checked={formData.solicitoBeca}
-            onChange={handleChange}
-          />
-          <label>Solicitó beca</label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            name="trabajador"
-            checked={formData.trabajador}
-            onChange={handleChange}
-          />
-          <label>Trabajador</label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            name="personaACargo"
-            checked={formData.personaACargo}
-            onChange={handleChange}
-          />
-          <label>Persona a cargo</label>
-        </div>
-
-        {/* Observaciones */}
-        <div className="col-span-1 md:col-span-2">
-          <label className="block text-sm font-medium mb-1">
-            Observaciones
-          </label>
-          <textarea
-            name="observaciones"
-            value={formData.observaciones}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            rows={3}
-          ></textarea>
-        </div>
+        <select
+          name="areaTelefonicaCodigo"
+          value={formData.areaTelefonicaCodigo}
+          onChange={handleChange}
+          className="border p-2 rounded"
+        >
+          <option value="">Seleccione área telefónica</option>
+          {areas.map((a) => (
+            <option key={a.id} value={a.codigo}>
+              {a.codigo}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <div className="mt-6">
-        <button type="submit" className="btn-primary w-full">
-          {student ? 'Actualizar Estudiante' : 'Registrar Estudiante'}
+      <div className="flex flex-wrap gap-4 mt-2">
+        {["examenMayores25", "solicitoBeca", "trabajador", "personaACargo"].map(
+          (field) => (
+            <label key={field} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name={field}
+                checked={(formData as any)[field]}
+                onChange={handleChange}
+              />
+              {field}
+            </label>
+          )
+        )}
+      </div>
+
+      <textarea
+        name="observaciones"
+        value={formData.observaciones || ""}
+        onChange={handleChange}
+        placeholder="Observaciones"
+        className="border p-2 rounded w-full mt-2"
+      />
+
+      <div className="flex justify-end gap-2">
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Guardar
         </button>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="bg-gray-400 text-white px-4 py-2 rounded"
+          >
+            Cancelar
+          </button>
+        )}
       </div>
     </form>
   );
-}
+};
 
+export default StudentForm;
