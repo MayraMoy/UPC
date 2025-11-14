@@ -1,102 +1,80 @@
 import { useEffect, useState } from "react";
 import { StudentService } from "../services/studentService";
-import type { Estudiante, CreateEstudianteDto } from "../services/studentService";
-import StudentForm from "../components/students/StudentForm";
 import StudentList from "../components/students/StudentList";
+import type { Estudiante } from "../services/studentService";
+import { useNavigate } from 'react-router-dom';
 
 const StudentsPage = () => {
   const [students, setStudents] = useState<Estudiante[]>([]);
-  const [selected, setSelected] = useState<Estudiante | null>(null);
-  const [showForm, setShowForm] = useState(false);
+  const [filteredStudents, setFilteredStudents] = useState<Estudiante[]>([]);
+  const [search, setSearch] = useState("");
+  const [, setSelectedStudent] = useState<Estudiante | null>(null);
+  const navigate = useNavigate();
 
   const loadStudents = async () => {
-    const res = await StudentService.getAll();
-    setStudents(res.data);
+    try {
+      const res = await StudentService.getAll();
+      setStudents(res.data);
+      setFilteredStudents(res.data);
+    } catch (error) {
+      console.error("Error al cargar estudiantes:", error);
+    }
   };
 
   useEffect(() => {
     loadStudents();
   }, []);
 
-  const handleCreate = async (data: CreateEstudianteDto) => {
-    await StudentService.create(data);
-    setShowForm(false);
+  // filtro de búsqueda
+  useEffect(() => {
+    const text = search.toLowerCase();
+    setFilteredStudents(
+      students.filter((s) =>
+        `${s.nombres} ${s.apellidos}`.toLowerCase().includes(text) ||
+        s.dni.toLowerCase().includes(text)
+      )
+    );
+  }, [search, students]);
+
+  const handleDeactivate = async (id: number) => {
+    await StudentService.deactivate(id);
     loadStudents();
   };
 
-  const handleUpdate = async (id: number, data: CreateEstudianteDto) => {
-    await StudentService.update(id, data);
-    setSelected(null);
-    setShowForm(false);
+  const handleReactivate = async (id: number) => {
+    await StudentService.reactivate(id);
     loadStudents();
-  };
-
-  const handleDelete = async (id: number) => {
-    if (window.confirm("¿Eliminar estudiante?")) {
-      await StudentService.deactivate(id);
-      loadStudents();
-    }
   };
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Gestión de Estudiantes</h1>
+      <button
+        onClick={() => navigate('/dashboard')}
+        className="mb-4 px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition"
+      >
+        ← Volver al Dashboard
+      </button>
 
-      {!showForm ? (
-        <button
-          onClick={() => setShowForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded mb-4"
-        >
-          Registrar Estudiante
-        </button>
-      ) : (
-        <StudentForm
-          onSubmit={
-            selected
-              ? (data) => handleUpdate(selected.id, data)
-              : handleCreate
-          }
-          initialData={
-            selected
-              ? {
-                  nombres: selected.nombres,
-                  apellidos: selected.apellidos,
-                  dni: selected.dni,
-                  fechaNacimiento: "",
-                  email: selected.email,
-                  telefono: selected.telefono,
-                  domicilio: "",
-                  cohorte: "",
-                  secundario: "",
-                  cuil: "",
-                  examenMayores25: false,
-                  solicitoBeca: false,
-                  trabajador: false,
-                  personaACargo: false,
-                  observaciones: "",
-                  paisNombre: selected.pais?.nombre || "",
-                  localidadNombre: selected.localidad?.nombre || "",
-                  generoNombre: selected.genero?.nombre || "",
-                  areaTelefonicaCodigo: selected.areaTelefonica?.codigo || "",
-                }
-              : undefined
-          }
-          onCancel={() => setShowForm(false)}
-        />
-      )}
+      <h1 className="text-2xl font-bold">Gestión de Estudiantes</h1>
 
-      {!showForm && (
-        <StudentList
-          students={students}
-          onEdit={(student) => {
-            setSelected(student);
-            setShowForm(true);
-          }}
-          onDelete={handleDelete}
-        />
-      )}
+      {/* Buscador */}
+      <input
+        type="text"
+        placeholder="Buscar por nombre o DNI..."
+        className="border p-2 mt-4 w-80"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
+      <StudentList
+        students={filteredStudents}
+        onEdit={setSelectedStudent}
+        onDeactivate={handleDeactivate}
+        onReactivate={handleReactivate}
+      />
     </div>
   );
 };
 
 export default StudentsPage;
+

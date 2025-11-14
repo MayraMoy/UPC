@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_URL) ||
-  (process.env["REACT_APP_API_URL"] as string | undefined) ||
+  process.env["REACT_APP_API_URL"] ||
   "http://localhost:5000/api";
 
 const getAuthHeaders = () => {
@@ -13,7 +13,8 @@ const getAuthHeaders = () => {
     },
   };
 };
-// 🧩 Tipos principales
+
+// ---------------- TIPOS ----------------
 export interface Estudiante {
   id: number;
   nombres: string;
@@ -30,13 +31,13 @@ export interface Estudiante {
   trabajador: boolean;
   personaACargo: boolean;
   observaciones?: string;
-  pais?: { id: number; nombre: string };
-  localidad?: { id: number; nombre: string };
-  genero?: { id: number; nombre: string };
-  areaTelefonica?: { id: number; codigo: string };
+  estado: string;
+  pais?: { nombre: string };
+  localidad?: { nombre: string };
+  genero?: { nombre: string };
+  areaTelefonica?: { codigo: string };
 }
 
-// 🧩 Datos para crear o editar estudiante
 export interface CreateEstudianteDto {
   nombres: string;
   apellidos: string;
@@ -59,7 +60,7 @@ export interface CreateEstudianteDto {
   areaTelefonicaCodigo: string;
 }
 
-// 🧩 Servicio principal de estudiantes
+// ---------------- SERVICIO ----------------
 export const StudentService = {
   async getAll() {
     return axios.get(`${API_URL}/students`, getAuthHeaders());
@@ -80,9 +81,13 @@ export const StudentService = {
   async deactivate(id: number) {
     return axios.patch(`${API_URL}/students/${id}/deactivate`, {}, getAuthHeaders());
   },
+
+  async reactivate(id: number) {
+    return axios.patch(`${API_URL}/students/${id}/reactivate`, {}, getAuthHeaders());
+  },
 };
 
-// 🧩 Servicios auxiliares para selects (para mostrar nombres en vez de IDs)
+// ---------------- AUXILIARES ----------------
 export async function getPaises() {
   const res = await axios.get(`${API_URL}/paises`);
   return res.data;
@@ -102,5 +107,3 @@ export async function getAreasTelefonicas() {
   const res = await axios.get(`${API_URL}/areas-telefonicas`);
   return res.data;
 }
-
-

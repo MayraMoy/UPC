@@ -244,3 +244,19 @@ export const deactivateStudent = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Error interno del servidor." });
   }
 };
+
+export const reactivateStudent = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const estudiante = await prisma.estudiante.update({
+      where: { id: Number(id) },
+      data: { estado: "Activo" },
+    });
+
+    return res.json({ message: "Estudiante reactivado correctamente.", estudiante });
+  } catch (error) {
+    console.error("Error al reactivar estudiante:", error);
+    return res.status(500).json({ message: "Error interno del servidor." });
+  }
+};

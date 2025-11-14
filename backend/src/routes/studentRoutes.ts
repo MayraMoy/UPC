@@ -49,5 +49,12 @@ router.patch(
   studentController.deactivateStudent
 );
 
+router.patch(
+  "/:id/reactivate", 
+  authenticate, 
+  authorizeRoles("ADMIN"), 
+  studentController.reactivateStudent
+);
+
 export default router;
 
