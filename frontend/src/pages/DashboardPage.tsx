@@ -79,9 +79,16 @@ export default function DashboardPage() {
     {
       title: 'Localidades',
       description: 'Administrar la lista de localidades.',
-      icon: '🌍',
+      icon: '📌',
       path: '/localidades',
-      roles: ['ADMIN']
+      roles: ['ADMIN'],
+    },
+    {
+      title: 'Cursadas',
+      description: 'Administrar cursadas, profesores y materias asignadas.',
+      icon: '📖',
+      path: '/cursadas',
+      roles: ['ADMIN', 'PERSONAL'],
     }
   ];
 
@@ -142,4 +149,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
