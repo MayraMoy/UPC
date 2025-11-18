@@ -5,11 +5,15 @@ import HomePage from './pages/HomePage';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import CareersPage from './pages/CareersPage';
-import NewStudentPage from './pages/NewStudentPage'; 
+import NewStudentPage from './pages/NewStudentPage';
 import DashboardPage from './pages/DashboardPage';
 import CountryPage from './pages/CountryPage';
 import LocalidadesPage from './pages/LocalidadesPage';
 import MateriasPage from './pages/MateriasPage';
+
+// NUEVOS
+import CursadaList from './pages/cursadas/CursadaList';
+import CursadaForm from './pages/cursadas/CursadaForm';
 
 function App() {
   return (
@@ -31,16 +35,33 @@ function App() {
             <Route path="/students/new" element={<NewStudentPage />} />
           </Route>
 
-          {/* Solo ADMIN */}
+          {/* Solo ADMIN — Carreras */}
           <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
             <Route path="/careers" element={<CareersPage />} />
           </Route>
+
+          {/* Solo ADMIN — Países */}
           <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
             <Route path="/paises" element={<CountryPage />} />
           </Route>
+
+          {/* ADMIN y PERSONAL — Localidades */}
           <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'PERSONAL']} />}>
             <Route path="/localidades" element={<LocalidadesPage />} />
           </Route>
+
+          {/* ADMIN, PERSONAL y DOCENTE — Cursadas */}
+          <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'PERSONAL', 'DOCENTE']} />}>
+            {/* Listado */}
+            <Route path="/cursadas" element={<CursadaList />} />
+
+            {/* Nueva cursada */}
+            <Route path="/cursadas/new" element={<CursadaForm />} />
+
+            {/* Editar cursada */}
+            <Route path="/cursadas/edit/:id" element={<CursadaForm />} />
+          </Route>
+
           <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'DOCENTE']} />}>
             <Route path="/materias" element={<MateriasPage />} />
           </Route>
