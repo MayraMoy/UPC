@@ -9,6 +9,7 @@ import NewStudentPage from './pages/NewStudentPage';
 import DashboardPage from './pages/DashboardPage';
 import CountryPage from './pages/CountryPage';
 import LocalidadesPage from './pages/LocalidadesPage';
+import MateriasPage from './pages/MateriasPage';
 
 // NUEVOS
 import CursadaList from './pages/cursadas/CursadaList';
@@ -61,6 +62,9 @@ function App() {
             <Route path="/cursadas/edit/:id" element={<CursadaForm />} />
           </Route>
 
+          <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'DOCENTE']} />}>
+            <Route path="/materias" element={<MateriasPage />} />
+          </Route>
         </Routes>
       </Layout>
     </Router>

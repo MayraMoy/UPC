@@ -52,7 +52,7 @@ export default function DashboardPage() {
       title: 'Gestión de Materias',
       description: 'Configurar materias y planes de estudio.',
       icon: '📚',
-      path: '/subjects',
+      path: '/materias',
       roles: ['ADMIN', 'DOCENTE'],
     },
     {

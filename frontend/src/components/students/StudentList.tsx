@@ -1,54 +1,62 @@
-// src/components/students/StudentList.tsx
-import type { Estudiante } from '../../services/api'; 
+import type { Estudiante } from "../../services/studentService";
 
 interface StudentListProps {
   students: Estudiante[];
+  onEdit: (student: Estudiante) => void;
+  onDeactivate: (id: number) => void;
+  onReactivate: (id: number) => void;
 }
 
-export default function StudentList({ students }: StudentListProps) {
-  if (students.length === 0) {
-    return <p className="text-primary">No hay estudiantes registrados.</p>;
-  }
+const StudentList = ({ students, onEdit, onDeactivate, onReactivate }: StudentListProps) => {
+  if (!students.length) return <p>No hay estudiantes registrados.</p>;
 
   return (
-    <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-primary uppercase tracking-wider">DNI</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-primary uppercase tracking-wider">Nombre</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-primary uppercase tracking-wider">Email</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-primary uppercase tracking-wider">País</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-primary uppercase tracking-wider">Estado</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-primary uppercase tracking-wider">Acciones</th>
+    <table className="w-full border border-gray-300 mt-4">
+      <thead>
+        <tr className="bg-gray-200">
+          <th className="p-2">Nombre</th>
+          <th className="p-2">DNI</th>
+          <th className="p-2">Estado</th>
+          <th className="p-2">Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {students.map((s) => (
+          <tr key={s.id} className="border-t border-gray-300">
+            <td className="p-2">{s.nombres} {s.apellidos}</td>
+            <td className="p-2">{s.dni}</td>
+            <td className="p-2">{s.estado}</td>
+
+            <td className="p-2 flex gap-2">
+              <button
+                onClick={() => onEdit(s)}
+                className="px-2 py-1 bg-blue-600 text-white rounded"
+              >
+                Editar
+              </button>
+
+              {s.estado === "Activo" ? (
+                <button
+                  onClick={() => onDeactivate(s.id)}
+                  className="px-2 py-1 bg-red-600 text-white rounded"
+                >
+                  Desactivar
+                </button>
+              ) : (
+                <button
+                  onClick={() => onReactivate(s.id)}
+                  className="px-2 py-1 bg-green-600 text-white rounded"
+                >
+                  Reactivar
+                </button>
+              )}
+            </td>
           </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {students.map((student) => (
-            <tr key={student.id_estudiante} className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">{student.dni}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-primary">
-                {student.nombres} {student.apellidos}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-primary">{student.email}</td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  student.estado === 'Activo'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {student.estado}
-                </span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button className="text-accent-soft hover:text-accent-strong mr-3">Ver</button>
-                <button className="text-accent-soft hover:text-accent-strong mr-3">Editar</button>
-                <button className="text-red-600 hover:text-red-900">Desactivar</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        ))}
+      </tbody>
+    </table>
   );
-}
+};
+
+export default StudentList;
