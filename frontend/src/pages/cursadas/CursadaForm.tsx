@@ -1,24 +1,13 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { CursadaService } from "../../services/cursadaService";
-import { CareerService } from "../../services/careerService";
 import { StudentService } from "../../services/api";
+import { MateriaService } from "../../services/materiaService";
 
 interface FormState {
   estudianteId: string;
-  carreraId: string;
-  anio: string;
-}
-
-interface StudentOption {
-  id: number;
-  nombres?: string;
-  apellidos?: string;
-}
-
-interface CareerOption {
-  id: number;
-  nombre?: string;
+  materiaId: string;
+  notaFinal: string;
 }
 
 const CursadaForm = () => {
@@ -27,37 +16,38 @@ const CursadaForm = () => {
 
   const [form, setForm] = useState<FormState>({
     estudianteId: "",
-    carreraId: "",
-    anio: "",
+    materiaId: "",
+    notaFinal: "",
   });
 
-  const [estudiantes, setEstudiantes] = useState<StudentOption[]>([]);
-  const [careers, setCareers] = useState<CareerOption[]>([]);
+  const [estudiantes, setEstudiantes] = useState<any[]>([]);
+  const [materias, setMaterias] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [estRes, carRes] = await Promise.all([StudentService.getAll(), CareerService.getAll()]);
-        setEstudiantes((estRes.data as StudentOption[]) || []);
-        setCareers((carRes.data as CareerOption[]) || []);
+        const [estRes, matRes] = await Promise.all([
+          StudentService.getAll(),
+          MateriaService.getAll()
+        ]);
+
+        setEstudiantes(estRes.data || []);
+        setMaterias(matRes.data || []);
 
         if (id) {
           const curRes = await CursadaService.getById(Number(id));
-          const data = curRes.data as Partial<FormState> & {
-            estudiante?: { id?: number };
-            carrera?: { id?: number };
-          };
+          const data = curRes.data;
+
           setForm({
-            estudianteId: String(data.estudianteId ?? data.estudiante?.id ?? ""),
-            carreraId: String(data.carreraId ?? data.carrera?.id ?? ""),
-            anio: String(data.anio ?? ""),
+            estudianteId: String(data.estudianteId),
+            materiaId: String(data.materiaId),
+            notaFinal: String(data.notaFinal ?? "")
           });
         }
       } catch (err) {
-        console.error("Error cargando datos del formulario:", err);
-        alert("Error al cargar datos. Revisá la consola.");
+        console.error("Error cargando form:", err);
       } finally {
         setLoading(false);
       }
@@ -66,101 +56,100 @@ const CursadaForm = () => {
     load();
   }, [id]);
 
-  const handleChange = (e: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSaving(true);
 
-    try {
-      const payload = {
-        estudianteId: Number(form.estudianteId),
-        carreraId: Number(form.carreraId),
-        anio: Number(form.anio),
-      };
+    const payload = {
+      estudianteId: Number(form.estudianteId),
+      materiaId: Number(form.materiaId),
+      notaFinal: form.notaFinal ? Number(form.notaFinal) : null,
+    };
 
+    try {
       if (id) {
         await CursadaService.update(Number(id), payload);
       } else {
         await CursadaService.create(payload);
       }
-
       navigate("/cursadas");
     } catch (err) {
       console.error("Error guardando cursada:", err);
-      alert("No se pudo guardar la cursada. Revisá la consola.");
+      alert("Error guardando cursada");
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) return <div className="p-6">Cargando...</div>;
+  if (loading) return <div className="p-4">Cargando...</div>;
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">{id ? "Editar Cursada" : "Nueva Cursada"}</h2>
+    <div className="p-6 max-w-lg mx-auto">
+      <h2 className="text-xl font-bold mb-4">{id ? "Editar Cursada" : "Nueva Cursada"}</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        
         <div>
-          <label className="block mb-1">Estudiante</label>
+          <label>Estudiante</label>
           <select
             name="estudianteId"
             value={form.estudianteId}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full p-2 border rounded"
             required
           >
             <option value="">Seleccione...</option>
             {estudiantes.map((s) => (
               <option key={s.id} value={s.id}>
-                {s.nombres} {s.apellidos ?? ""}
+                {s.nombres} {s.apellidos}
               </option>
             ))}
           </select>
         </div>
 
         <div>
-          <label className="block mb-1">Carrera</label>
-          <select name="carreraId" value={form.carreraId} onChange={handleChange} className="w-full border p-2 rounded" required>
-            <option value="">Seleccione...</option>
-            {careers.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block mb-1">Año</label>
-          <input
-            name="anio"
-            type="number"
-            min="1"
-            max="10"
-            value={form.anio}
+          <label>Materia</label>
+          <select
+            name="materiaId"
+            value={form.materiaId}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full p-2 border rounded"
             required
+          >
+            <option value="">Seleccione...</option>
+            {materias.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label>Nota Final</label>
+          <input
+            type="number"
+            name="notaFinal"
+            value={form.notaFinal}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+            min="0"
+            max="10"
           />
         </div>
 
-        <div className="flex justify-end">
-          <button
-            type="button"
-            className="mr-2 px-4 py-2 border rounded"
-            onClick={() => navigate("/cursadas")}
-            disabled={saving}
-          >
-            Cancelar
-          </button>
-          <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded" disabled={saving}>
-            {saving ? "Guardando..." : "Guardar"}
-          </button>
-        </div>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+          disabled={saving}
+        >
+          {saving ? "Guardando..." : "Guardar"}
+        </button>
       </form>
     </div>
   );
