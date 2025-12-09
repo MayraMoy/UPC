@@ -5,8 +5,8 @@ import { CursadaService } from "../../services/cursadaService";
 interface CursadaSummary {
   id: number;
   estudianteId?: number;
-  carreraId?: number;
-  anio?: number;
+  materiaId?: number;
+  notaFinal?: number;
   estudiante?: {
     nombres?: string;
     apellidos?: string;
@@ -69,8 +69,8 @@ const CursadaList = () => {
             <tr className="bg-gray-100">
               <th className="p-2 border">ID</th>
               <th className="p-2 border">Estudiante</th>
-              <th className="p-2 border">Carrera</th>
-              <th className="p-2 border">Año</th>
+              <th className="p-2 border">Id Materia</th>
+              <th className="p-2 border">Nota Final</th>
               <th className="p-2 border">Acciones</th>
             </tr>
           </thead>
@@ -89,8 +89,8 @@ const CursadaList = () => {
                 <td className="p-2 border">
                   {c.estudiante?.nombres ? `${c.estudiante.nombres} ${c.estudiante.apellidos || ""}` : c.estudianteId}
                 </td>
-                <td className="p-2 border">{c.carrera?.nombre ?? c.carreraId}</td>
-                <td className="p-2 border">{c.anio ?? "-"}</td>
+                <td className="p-2 border">{c.materiaId ?? "-"}</td>
+                <td className="p-2 border">{c.notaFinal ?? "-"}</td>
                 <td className="p-2 border">
                   <Link to={`/cursadas/edit/${c.id}`} className="inline-block mr-2 px-3 py-1 bg-yellow-500 text-white rounded">
                     Editar
